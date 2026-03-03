@@ -1,0 +1,392 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Workspace Hierarchy</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body { font-family: 'Segoe UI', sans-serif; background: #f4f6f9; padding: 20px 40px; margin: 0; }
+.container { max-width: 1600px; margin: auto; }
+
+.view-switcher {
+    display: flex;
+    gap: 0;
+    margin-bottom: 24px;
+    background: white;
+    padding: 6px;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    width: fit-content;
+}
+.view-switcher button {
+    padding: 12px 28px;
+    border: none;
+    background: transparent;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 8px;
+    color: #5f6368;
+    transition: all 0.2s;
+}
+.view-switcher button:hover {
+    background: #f0f2f5;
+    color: #1a1a1a;
+}
+.view-switcher button.active {
+    background: #1a73e8;
+    color: white;
+}
+
+.view-panel { display: none; }
+.view-panel.active { display: block; }
+
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 6px 25px rgba(0,0,0,0.08);
+    margin-bottom: 40px;
+}
+
+h2 { margin-top: 0; }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    vertical-align: top;
+}
+
+th {
+    background: #f0f2f5;
+    text-align: left;
+}
+
+.badge {
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+    margin-left: 6px;
+}
+
+.toggle-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.tenant-wrapper {
+    display: none;
+    margin-top: 8px;
+}
+
+#view-sheets .sheets-table { font-size: 13px; }
+#view-sheets .sheets-table th {
+    background: #1a73e8;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+#view-sheets .sheets-table tbody tr:nth-child(even) { background: #f8f9fa; }
+#view-sheets .sheets-table tbody tr:hover { background: #e8f0fe; }
+#view-sheets .sheets-wrap {
+    overflow-x: auto;
+    max-height: 75vh;
+    overflow-y: auto;
+}
+</style>
+
+<script>
+function setView(viewId) {
+    document.querySelectorAll('.view-panel').forEach(function(el) { el.classList.remove('active'); });
+    document.querySelectorAll('.view-switcher button').forEach(function(btn) { btn.classList.remove('active'); });
+    document.getElementById(viewId).classList.add('active');
+    var btn = document.querySelector('.view-switcher button[data-view="' + viewId + '"]');
+    if (btn) btn.classList.add('active');
+}
+function toggleTenants(id) {
+    var element = document.getElementById(id);
+    var arrow = document.getElementById("arrow-" + id);
+    if (element.style.display === "none") {
+        element.style.display = "block";
+        arrow.innerHTML = "▼";
+    } else {
+        element.style.display = "none";
+        arrow.innerHTML = "▶";
+    }
+}
+</script>
+</head>
+<body>
+<div class="container">
+<div class="view-switcher">
+    <button type="button" class="active" data-view="view-ui" onclick="setView('view-ui')">View as UI</button>
+    <button type="button" data-view="view-sheets" onclick="setView('view-sheets')">View as Sheets</button>
+</div>
+
+<div id="view-ui" class="view-panel active">
+
+<div class="card">
+<h2>Stand Alone Workspaces</h2>
+<table>
+<tr>
+<th>Name</th>
+<th>ID</th>
+<th>Status</th>
+</tr>
+
+    <tr>
+        <td>HPE GreenLake Support</td>
+        <td>409bbcfa127611ec963d36ef5c5682ad</td>
+        <td><span class="badge" style="background:#2e7d32">ACTIVE</span></td>
+    </tr>
+    
+    <tr>
+        <td>Kowshik Activate</td>
+        <td>5581b87c7ab811ec9b8eb6e766d09539</td>
+        <td><span class="badge" style="background:#2e7d32">ACTIVE</span></td>
+    </tr>
+    
+    <tr>
+        <td>United States Federal Trade Commission</td>
+        <td>75eebb827ab811ecacb9961c1269fd91</td>
+        <td><span class="badge" style="background:#2e7d32">ACTIVE</span></td>
+    </tr>
+    
+    <tr>
+        <td>Bundaberg Brewed Drinks</td>
+        <td>79be504c855311ec88de22f9d53ea089</td>
+        <td><span class="badge" style="background:#2e7d32">ACTIVE</span></td>
+    </tr>
+    
+    <tr>
+        <td>TEST GREENLAKE -1</td>
+        <td>30909408fa1811ed9adce60af3023704</td>
+        <td><span class="badge" style="background:#2e7d32">ACTIVE</span></td>
+    </tr>
+    
+    <tr>
+        <td>GPSTDIAG</td>
+        <td>1523cad24b1211ee9e9eb648e295f988</td>
+        <td><span class="badge" style="background:#2e7d32">ACTIVE</span></td>
+    </tr>
+    
+    <tr>
+        <td>Testing Catalog</td>
+        <td>74170f38aa2e11eeab86e670afd63208</td>
+        <td><span class="badge" style="background:#2e7d32">ACTIVE</span></td>
+    </tr>
+    
+    <tr>
+        <td>YashasEnt</td>
+        <td>465ea560977611f0834cd69235670d51</td>
+        <td><span class="badge" style="background:#2e7d32">ACTIVE</span></td>
+    </tr>
+    
+    <tr>
+        <td>SSSaaan</td>
+        <td>ad9d372a979211f0992caa3647c6155e</td>
+        <td><span class="badge" style="background:#2e7d32">ACTIVE</span></td>
+    </tr>
+    </table></div>
+<div class="card">
+<h2>MSP Workspaces</h2>
+<table>
+<tr>
+<th>MSP Name</th>
+<th>MSP ID</th>
+<th>Status</th>
+<th>Tenants</th>
+</tr>
+
+    <tr>
+        <td>switcher</td>
+        <td>4378fcc4977611f0928c668eca2cd7fe</td>
+        <td><span class="badge" style="background:#2e7d32">ACTIVE</span></td>
+        <td>
+        <button class="toggle-btn" onclick="toggleTenants('tenant_4378fcc4977611f0928c668eca2cd7fe')">
+            <span id="arrow-tenant_4378fcc4977611f0928c668eca2cd7fe">▶</span> View Tenants (2)
+        </button>
+        <div id="tenant_4378fcc4977611f0928c668eca2cd7fe" class="tenant-wrapper"><table style="width:95%; font-size:13px;"><tr><th>Tenant Name</th><th>ID</th><th>Status</th></tr>
+            <tr>
+                <td>AMERICA</td>
+                <td>8c3674f4b3c911f0bb0f6e5e242f84c8</td>
+                <td><span class="badge" style="background:#2e7d32">ACTIVE</span></td>
+            </tr>
+            
+            <tr>
+                <td>CO</td>
+                <td>81d4a540c05211f0b333ae29e501ca14</td>
+                <td><span class="badge" style="background:#2e7d32">ACTIVE</span></td>
+            </tr>
+            </table></div>
+        </td>
+    </tr>
+    
+    <tr>
+        <td>DEMO ACCESAR</td>
+        <td>3e7083f602dc11f1ab54fa7712d28b81</td>
+        <td><span class="badge" style="background:#2e7d32">ACTIVE</span></td>
+        <td>
+        <button class="toggle-btn" onclick="toggleTenants('tenant_3e7083f602dc11f1ab54fa7712d28b81')">
+            <span id="arrow-tenant_3e7083f602dc11f1ab54fa7712d28b81">▶</span> View Tenants (1)
+        </button>
+        <div id="tenant_3e7083f602dc11f1ab54fa7712d28b81" class="tenant-wrapper"><table style="width:95%; font-size:13px;"><tr><th>Tenant Name</th><th>ID</th><th>Status</th></tr>
+            <tr>
+                <td>SOCIEDAD PORTUARIA DE BARRANQUILLA</td>
+                <td>0286f580060d11f18bf79261b9c0875d</td>
+                <td><span class="badge" style="background:#2e7d32">ACTIVE</span></td>
+            </tr>
+            </table></div>
+        </td>
+    </tr>
+    </table></div>
+</div>
+
+<div id="view-sheets" class="view-panel">
+<div class="card">
+<h2>All Workspaces (Sheets View)</h2>
+<div class="sheets-wrap">
+<table class="sheets-table">
+<thead>
+<tr>
+<th>Type</th>
+<th>Name</th>
+<th>ID</th>
+<th>Status</th>
+<th>Parent ID</th>
+</tr>
+</thead>
+<tbody>
+
+    <tr>
+        <td>Standalone</td>
+        <td>HPE GreenLake Support</td>
+        <td>409bbcfa127611ec963d36ef5c5682ad</td>
+        <td><span class="badge" style="background:#2e7d32">ACTIVE</span></td>
+        <td></td>
+    </tr>
+    
+    <tr>
+        <td>Standalone</td>
+        <td>Kowshik Activate</td>
+        <td>5581b87c7ab811ec9b8eb6e766d09539</td>
+        <td><span class="badge" style="background:#2e7d32">ACTIVE</span></td>
+        <td></td>
+    </tr>
+    
+    <tr>
+        <td>Standalone</td>
+        <td>United States Federal Trade Commission</td>
+        <td>75eebb827ab811ecacb9961c1269fd91</td>
+        <td><span class="badge" style="background:#2e7d32">ACTIVE</span></td>
+        <td></td>
+    </tr>
+    
+    <tr>
+        <td>Standalone</td>
+        <td>Bundaberg Brewed Drinks</td>
+        <td>79be504c855311ec88de22f9d53ea089</td>
+        <td><span class="badge" style="background:#2e7d32">ACTIVE</span></td>
+        <td></td>
+    </tr>
+    
+    <tr>
+        <td>Standalone</td>
+        <td>TEST GREENLAKE -1</td>
+        <td>30909408fa1811ed9adce60af3023704</td>
+        <td><span class="badge" style="background:#2e7d32">ACTIVE</span></td>
+        <td></td>
+    </tr>
+    
+    <tr>
+        <td>Standalone</td>
+        <td>GPSTDIAG</td>
+        <td>1523cad24b1211ee9e9eb648e295f988</td>
+        <td><span class="badge" style="background:#2e7d32">ACTIVE</span></td>
+        <td></td>
+    </tr>
+    
+    <tr>
+        <td>Standalone</td>
+        <td>Testing Catalog</td>
+        <td>74170f38aa2e11eeab86e670afd63208</td>
+        <td><span class="badge" style="background:#2e7d32">ACTIVE</span></td>
+        <td></td>
+    </tr>
+    
+    <tr>
+        <td>Standalone</td>
+        <td>YashasEnt</td>
+        <td>465ea560977611f0834cd69235670d51</td>
+        <td><span class="badge" style="background:#2e7d32">ACTIVE</span></td>
+        <td></td>
+    </tr>
+    
+    <tr>
+        <td>Standalone</td>
+        <td>SSSaaan</td>
+        <td>ad9d372a979211f0992caa3647c6155e</td>
+        <td><span class="badge" style="background:#2e7d32">ACTIVE</span></td>
+        <td></td>
+    </tr>
+    
+    <tr>
+        <td>MSP</td>
+        <td>switcher</td>
+        <td>4378fcc4977611f0928c668eca2cd7fe</td>
+        <td><span class="badge" style="background:#2e7d32">ACTIVE</span></td>
+        <td></td>
+    </tr>
+    
+    <tr>
+        <td>Tenant</td>
+        <td>AMERICA</td>
+        <td>8c3674f4b3c911f0bb0f6e5e242f84c8</td>
+        <td><span class="badge" style="background:#2e7d32">ACTIVE</span></td>
+        <td>4378fcc4977611f0928c668eca2cd7fe</td>
+    </tr>
+    
+    <tr>
+        <td>Tenant</td>
+        <td>CO</td>
+        <td>81d4a540c05211f0b333ae29e501ca14</td>
+        <td><span class="badge" style="background:#2e7d32">ACTIVE</span></td>
+        <td>4378fcc4977611f0928c668eca2cd7fe</td>
+    </tr>
+    
+    <tr>
+        <td>MSP</td>
+        <td>DEMO ACCESAR</td>
+        <td>3e7083f602dc11f1ab54fa7712d28b81</td>
+        <td><span class="badge" style="background:#2e7d32">ACTIVE</span></td>
+        <td></td>
+    </tr>
+    
+    <tr>
+        <td>Tenant</td>
+        <td>SOCIEDAD PORTUARIA DE BARRANQUILLA</td>
+        <td>0286f580060d11f18bf79261b9c0875d</td>
+        <td><span class="badge" style="background:#2e7d32">ACTIVE</span></td>
+        <td>3e7083f602dc11f1ab54fa7712d28b81</td>
+    </tr>
+    
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
