@@ -1,0 +1,92 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Workspace Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {
+    font-family: Segoe UI;
+    background: #f4f6f9;
+    padding: 40px;
+}
+
+.container {
+    max-width: 1500px;
+    margin: auto;
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 6px 25px rgba(0,0,0,0.08);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    vertical-align: top;
+}
+
+th {
+    background: #e0e0e0;
+}
+
+.toggle-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.tenant-wrapper {
+    display: none;
+    margin-top: 6px;
+}
+
+.status {
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    color: white;
+    margin-left: 6px;
+}
+</style>
+
+<script>
+function toggleTenants(id) {
+    var element = document.getElementById(id);
+    var arrow = document.getElementById("arrow-" + id);
+
+    if (element.style.display === "none") {
+        element.style.display = "block";
+        arrow.innerHTML = "▼";
+    } else {
+        element.style.display = "none";
+        arrow.innerHTML = "▶";
+    }
+}
+</script>
+
+</head>
+<body>
+<div class="container">
+
+<h2>Workspace Dashboard</h2>
+<p><b>User:</b> vishal.kumar-ext@hpe.com</p>
+
+<table>
+<tr>
+    <th>Standalone</th>
+    <th>Customer ID</th>
+    <th>MSP Workspace</th>
+    <th>MSP ID</th>
+</tr>
+
+</table>
+</div>
+</body>
+</html>

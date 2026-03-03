@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User & Account Management — HPE GreenLake</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --hpe-green:      #01a982;
+      --hpe-green-dim:  #00856a;
+      --hpe-green-glow: rgba(1,169,130,0.18);
+      --hpe-cyan:       #00c8ff;
+      --hpe-cyan-glow:  rgba(0,200,255,0.15);
+      --hpe-purple:     #7630ea;
+      --black:          #050810;
+      --surface:        #0b0f1a;
+      --panel:          #0f1424;
+      --panel-alt:      #131828;
+      --border:         rgba(255,255,255,0.07);
+      --border-bright:  rgba(255,255,255,0.14);
+      --text:           #f0f4ff;
+      --text-secondary: #a8b4cc;
+      --muted:          #5a6580;
+      --warn:           #ff6b6b;
+      --font-mono: 'JetBrains Mono', monospace;
+      --font-sans: 'Inter', system-ui, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { background: var(--black); color: var(--text); font-family: var(--font-sans); min-height: 100vh; overflow-x: hidden; }
+
+    .aurora { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+    .aurora-blob { position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0; animation: blobPulse 12s ease-in-out infinite; }
+    .aurora-blob:nth-child(1) { width:700px;height:700px;background:radial-gradient(circle,rgba(1,169,130,.22) 0%,transparent 70%);top:-200px;left:-200px;animation-delay:0s;animation-duration:14s; }
+    .aurora-blob:nth-child(2) { width:500px;height:500px;background:radial-gradient(circle,rgba(0,200,255,.15) 0%,transparent 70%);top:40%;right:-100px;animation-delay:3s;animation-duration:18s; }
+    .aurora-blob:nth-child(3) { width:600px;height:600px;background:radial-gradient(circle,rgba(118,48,234,.12) 0%,transparent 70%);bottom:-150px;left:30%;animation-delay:6s;animation-duration:16s; }
+    @keyframes blobPulse { 0%{opacity:0;transform:scale(.9) translate(0,0);}25%{opacity:1;}50%{opacity:.7;transform:scale(1.05) translate(30px,-20px);}75%{opacity:1;}100%{opacity:0;transform:scale(.9) translate(0,0);} }
+    .grid-overlay { position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 40%,transparent 100%); }
+    .noise { position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.03;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E"); }
+    @keyframes statusPulse { 0%,100%{box-shadow:0 0 0 0 rgba(1,169,130,.7);}50%{box-shadow:0 0 0 4px rgba(1,169,130,0);} }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .header { position: fixed; top:0; left:0; right:0; z-index: 100; height: 68px; display: flex; align-items: center; justify-content: space-between; padding: 0 48px; transition: all .4s ease; }
+    .header::before { content:''; position:absolute; inset:0; background: rgba(5,8,16,.6); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border-bottom: 1px solid var(--border); z-index:-1; }
+    .logo-area { display:flex;align-items:center;gap:14px;text-decoration:none;cursor:pointer; }
+    .hpe-badge { position:relative;width:38px;height:38px;background:var(--hpe-green);display:flex;align-items:center;justify-content:center;clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);transition:transform .3s ease; }
+    .logo-area:hover .hpe-badge { transform:rotate(30deg) scale(1.1); }
+    .hpe-badge svg { color:#000; }
+    .logo-text-group { display:flex;flex-direction:column;gap:1px; }
+    .logo-eyebrow { font-family:var(--font-mono);font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:var(--hpe-green); }
+    .logo-name { font-size:16px;font-weight:700;color:var(--text);letter-spacing:-.03em; }
+    .logo-name em { color:var(--hpe-green);font-style:normal; }
+    .header-nav { display:flex;align-items:center;gap:8px; }
+    .nav-pill { display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:100px;border:1px solid var(--border);font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;color:var(--muted);background:transparent;transition:all .3s ease;text-decoration:none; }
+    .nav-pill:hover { border-color:var(--hpe-green);color:var(--hpe-green);background:var(--hpe-green-glow); }
+    .status-dot { width:6px;height:6px;border-radius:50%;background:var(--hpe-green);animation:statusPulse 2s ease-in-out infinite; }
+
+    .sidebar { position:fixed;left:0;top:68px;bottom:0;width:280px;z-index:90; background:var(--panel);border-right:1px solid var(--border-bright); display:flex;flex-direction:column;overflow:hidden; transform:translateX(0); transition:transform .35s cubic-bezier(.22,1,.36,1); }
+    .sidebar.collapsed { transform:translateX(-280px); }
+    .sidebar-toggle-tab { position:fixed;left:280px;top:50%;transform:translateY(-50%);z-index:91; width:22px;height:64px;background:var(--panel); border:1px solid var(--border-bright);border-left:none; border-radius:0 10px 10px 0; display:flex;align-items:center;justify-content:center; cursor:pointer;color:var(--muted);padding:0;outline:none; transition:left .35s cubic-bezier(.22,1,.36,1),color .2s,background .2s; }
+    .sidebar-toggle-tab:hover { color:var(--hpe-green);background:rgba(1,169,130,.06); }
+    .sidebar.collapsed + .sidebar-toggle-tab { left:0; }
+    .tab-arrow { display:flex;transition:transform .35s cubic-bezier(.22,1,.36,1); }
+    .sidebar.collapsed + .sidebar-toggle-tab .tab-arrow { transform:rotate(180deg); }
+    .sidebar-header { display:flex;align-items:center;padding:18px 20px 14px; border-bottom:1px solid var(--border);flex-shrink:0; background:var(--surface); }
+    .sidebar-header-title { font-family:var(--font-mono);font-size:10px;font-weight:600; color:var(--text-secondary);letter-spacing:.18em;text-transform:uppercase; display:flex;align-items:center;gap:8px;flex:1; }
+    .sidebar-header-title svg { color:var(--hpe-green); }
+    .sidebar-body { flex:1;overflow-y:auto;display:flex;flex-direction:column; }
+    .sidebar-body::-webkit-scrollbar { width:4px; }
+    .sidebar-body::-webkit-scrollbar-thumb { background:var(--border);border-radius:4px; }
+    .sidebar-section { padding:18px 20px;border-bottom:1px solid var(--border); }
+    .sidebar-section:last-child { border-bottom:none; }
+    .sidebar-section-label { font-family:var(--font-mono);font-size:9px;font-weight:600; color:var(--muted);letter-spacing:.18em;text-transform:uppercase; margin-bottom:14px;display:flex;align-items:center;gap:8px; }
+    .sidebar-section-label::before { content:'';width:3px;height:12px;border-radius:2px;background:var(--hpe-green);flex-shrink:0; }
+    .sidebar-status-row { display:flex;align-items:center;justify-content:space-between;margin-bottom:12px; }
+    .sidebar-status-label { font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase; }
+    .headers-status { font-family:var(--font-mono);font-size:9px;padding:2px 10px;border-radius:100px; }
+    .headers-status.set   { background:rgba(1,169,130,.12);color:var(--hpe-green);border:1px solid rgba(1,169,130,.25); }
+    .headers-status.unset { background:rgba(90,101,128,.1);color:var(--muted);border:1px solid var(--border); }
+    .headers-hint { font-family:var(--font-mono);font-size:10px;color:var(--muted); }
+    .headers-textarea { width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;font-family:var(--font-mono);font-size:11px;color:var(--text);outline:none;resize:none;min-height:110px;max-height:180px;overflow-y:auto;line-height:1.8;transition:border-color .25s ease,box-shadow .25s ease; }
+    .headers-textarea:hover { border-color:rgba(0,200,255,.3); }
+    .headers-textarea:focus { border-color:var(--hpe-green);box-shadow:0 0 0 3px rgba(1,169,130,.09); }
+    .headers-textarea::placeholder { color:var(--muted); }
+    .username-input { width:100%;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;font-family:var(--font-mono);font-size:12px;color:var(--text);outline:none;margin-top:8px;transition:border-color .25s ease; }
+    .username-input:focus { border-color:var(--hpe-green);box-shadow:0 0 0 3px rgba(1,169,130,.09); }
+    .username-input::placeholder { color:var(--muted); }
+
+    .page { position:relative;z-index:1;padding:110px 64px 80px calc(280px + 64px);transition:padding-left .35s cubic-bezier(.22,1,.36,1); }
+    .page.sidebar-collapsed { padding-left:64px; }
+    .page-wrap { max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:28px; }
+
+    .page-hero { display:flex;align-items:flex-end;justify-content:space-between;padding-bottom:24px;border-bottom:1px solid var(--border); }
+    .page-overline { font-family:var(--font-mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--hpe-green);margin-bottom:12px;display:flex;align-items:center;gap:10px; }
+    .page-overline::before { content:'';width:24px;height:1px;background:var(--hpe-green); }
+    .page-title { font-size:clamp(32px,4vw,48px);font-weight:900;letter-spacing:-.04em;line-height:1;color:var(--text); }
+    .page-title em { font-style:normal;background:linear-gradient(135deg,var(--hpe-green),var(--hpe-cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text; }
+    .page-subtitle { margin-top:10px;font-size:15px;color:var(--text-secondary);line-height:1.7; }
+
+    .input-card { background:var(--panel);border:1px solid var(--border);border-radius:20px;overflow:hidden;transition:border-color .3s ease,box-shadow .3s ease; }
+    .input-card:focus-within { border-color:rgba(1,169,130,.3);box-shadow:0 0 0 1px rgba(1,169,130,.1),0 20px 60px rgba(0,0,0,.4); }
+    .input-body { padding:28px 28px 24px; }
+    .input-label { font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--text-secondary);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px; }
+    .input-label-dot { width:6px;height:6px;border-radius:50%;background:var(--hpe-green);animation:statusPulse 2s ease-in-out infinite; }
+    .input-actions-row { display:flex;align-items:center;justify-content:space-between;margin-top:18px; }
+    .input-hint { font-family:var(--font-mono);font-size:10px;color:var(--muted); }
+
+    .btn-group { display:flex;gap:8px;align-items:center; }
+    .btn { display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border:none;border-radius:8px;font-size:12px;font-family:var(--font-mono);font-weight:600;cursor:pointer;letter-spacing:.05em;transition:all .2s;white-space:nowrap; }
+    .btn-primary { background:var(--hpe-green);color:#000; }
+    .btn-primary:hover { background:#00c896;box-shadow:0 8px 24px rgba(1,169,130,.35); }
+    .btn-primary:disabled { opacity:.4;cursor:not-allowed;box-shadow:none; }
+    .btn-primary.has-input,.btn-primary.is-active { background:var(--hpe-green);box-shadow:0 0 14px rgba(1,169,130,.45),0 0 28px rgba(1,169,130,.2); }
+    .btn-ghost { background:transparent;color:var(--muted);border:1px solid var(--border); }
+    .btn-ghost:hover { border-color:var(--hpe-cyan);color:var(--hpe-cyan); }
+    .btn-success { background:transparent;color:var(--hpe-green);border:1px solid rgba(1,169,130,.4); }
+    .btn-success:hover { background:rgba(1,169,130,.1);border-color:var(--hpe-green); }
+    .btn-sm { padding:8px 16px;font-size:11px; }
+
+    .stats-row { display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px; }
+    .view-card { padding:28px 32px;border-radius:16px;cursor:pointer;border:1px solid var(--border);background:var(--panel);transition:all .25s;position:relative;overflow:hidden; }
+    .view-card::before { content:'';position:absolute;inset:0;opacity:0;transition:opacity .25s; }
+    .view-card.standalone-card::before { background:radial-gradient(circle at 0% 50%,rgba(1,169,130,.08),transparent 70%); }
+    .view-card.msp-card::before { background:radial-gradient(circle at 0% 50%,rgba(0,200,255,.08),transparent 70%); }
+    .view-card.tenant-card::before { background:radial-gradient(circle at 0% 50%,rgba(118,48,234,.07),transparent 70%); }
+    .view-card:hover::before,.view-card.active-card::before { opacity:1; }
+    .view-card.standalone-card:hover,.view-card.standalone-card.active-card { border-color:rgba(1,169,130,.45);box-shadow:0 0 0 1px rgba(1,169,130,.1); }
+    .view-card.msp-card:hover,.view-card.msp-card.active-card { border-color:rgba(0,200,255,.45);box-shadow:0 0 0 1px rgba(0,200,255,.1); }
+    .view-card.tenant-card:hover,.view-card.tenant-card.active-card { border-color:rgba(118,48,234,.45);box-shadow:0 0 0 1px rgba(118,48,234,.1); }
+    .vc-label { font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:.14em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px; }
+    .vc-dot { width:7px;height:7px;border-radius:50%; }
+    .vc-count { font-family:var(--font-mono);font-size:48px;font-weight:700;line-height:1; }
+    .view-card.standalone-card .vc-count { color:var(--hpe-green); }
+    .view-card.msp-card .vc-count { color:var(--hpe-cyan); }
+    .view-card.tenant-card .vc-count { color:var(--hpe-purple); }
+    .vc-pct { font-size:12px;color:var(--muted);margin-top:8px;font-family:var(--font-mono); }
+    .vc-bar { height:3px;background:var(--border);border-radius:2px;margin-top:14px; }
+    .vc-fill { height:100%;border-radius:2px;width:0%;transition:width .6s ease; }
+
+    .auth-error-banner { display:none;align-items:flex-start;gap:12px;background:rgba(255,107,107,.07);border:1px solid rgba(255,107,107,.35);border-radius:12px;padding:16px 20px;font-family:var(--font-mono);font-size:12px;color:var(--warn);animation:slideUp .25s ease; }
+    .auth-error-banner.visible { display:flex; }
+    .auth-error-banner-body { flex:1; }
+    .auth-error-banner-title { font-weight:600;font-size:12px;margin-bottom:4px;letter-spacing:.04em; }
+    .auth-error-banner-msg { color:rgba(255,107,107,.7);font-size:11px;line-height:1.6; }
+    .auth-error-banner-close { background:none;border:none;color:var(--warn);cursor:pointer;opacity:.6;padding:0;line-height:1;flex-shrink:0; }
+    .auth-error-banner-close:hover { opacity:1; }
+
+    .results-card { background:var(--panel);border:1px solid var(--border);border-radius:20px;overflow:hidden;display:flex;flex-direction:column;min-height:380px; }
+    .results-toolbar { display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-bottom:1px solid var(--border);flex-shrink:0;gap:12px;background:var(--surface); }
+    .results-toolbar-left { display:flex;align-items:center;gap:16px; }
+    .results-title { font-family:var(--font-mono);font-size:12px;font-weight:600;color:var(--hpe-cyan);letter-spacing:.1em;text-transform:uppercase; }
+    .results-toolbar-right { display:flex;align-items:center;gap:8px; }
+    .view-switcher { display:flex;gap:0;background:var(--panel);padding:6px;border-radius:10px;border:1px solid var(--border); }
+    .view-switcher-btn { padding:10px 20px;border:none;background:transparent;font-size:12px;font-family:var(--font-mono);font-weight:600;cursor:pointer;border-radius:8px;color:var(--muted);transition:all .2s; }
+    .view-switcher-btn:hover { color:var(--text); }
+    .view-switcher-btn.active { background:var(--hpe-green);color:#000; }
+    .view-panel { display:none; }
+    .view-panel.active { display:block; }
+    .hierarchy-section { background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px 32px;margin-bottom:24px; }
+    .hierarchy-section h3 { font-family:var(--font-mono);font-size:11px;color:var(--hpe-green);letter-spacing:.1em;margin-bottom:20px;display:flex;align-items:center;gap:10px; }
+    .hierarchy-section h3::before { content:'';width:4px;height:16px;border-radius:2px;background:var(--hpe-green); }
+    .hierarchy-table-wrap { overflow-x:auto;max-height:50vh;overflow-y:auto;border-radius:8px;border:1px solid var(--border); }
+    .hierarchy-table-wrap::-webkit-scrollbar { width:6px;height:6px; }
+    .hierarchy-table-wrap::-webkit-scrollbar-thumb { background:rgba(1,169,130,.35);border-radius:3px; }
+    .hierarchy-table-wrap::-webkit-scrollbar-thumb:hover { background:var(--hpe-green); }
+    .hierarchy-table { width:100%;border-collapse:collapse;font-size:13px;min-width:520px; }
+    .hierarchy-table th { position:sticky;top:0;background:var(--panel);text-align:left;padding:14px 20px;font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid var(--border-bright);z-index:1; }
+    .hierarchy-table td { padding:16px 20px;font-family:var(--font-sans);color:var(--text);border-bottom:1px solid var(--border);line-height:1.5; }
+    .hierarchy-table tbody tr { transition:background .15s ease; }
+    .hierarchy-table tbody tr:nth-child(even) { background:rgba(255,255,255,.02); }
+    .hierarchy-table tbody tr:hover { background:rgba(0,200,255,.06); }
+    .hierarchy-table td:first-child { font-weight:500;color:var(--text); }
+    .hierarchy-table .hierarchy-id { font-family:var(--font-mono);font-size:11px;color:var(--muted);background:rgba(255,255,255,.04);padding:6px 10px;border-radius:6px;display:inline-block;word-break:break-all;max-width:280px; }
+    .badge { display:inline-block;padding:4px 12px;border-radius:100px;font-size:11px;font-family:var(--font-mono);font-weight:600;letter-spacing:.04em; }
+    .toggle-btn { background:rgba(0,200,255,.08);border:1px solid rgba(0,200,255,.25);border-radius:8px;cursor:pointer;font-weight:600;font-size:12px;color:var(--hpe-cyan);padding:8px 14px;transition:all .2s; }
+    .toggle-btn:hover { background:rgba(0,200,255,.15);border-color:var(--hpe-cyan);color:var(--hpe-green); }
+    .tenant-wrapper { display:none;margin-top:16px;margin-left:24px;padding-left:20px;border-left:2px solid rgba(118,48,234,.3); }
+    .tenant-wrapper table { font-size:12px; }
+    .tenant-wrapper .hierarchy-table th { padding:12px 16px;font-size:9px; }
+    .tenant-wrapper .hierarchy-table td { padding:12px 16px; }
+    .sheets-wrap { overflow-x:auto;max-height:60vh;overflow-y:auto; }
+    .sheets-table { width:100%;border-collapse:collapse;font-size:12px; }
+    .sheets-table th { position:sticky;top:0;background:var(--hpe-green);color:#000;padding:12px 16px;font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;text-align:left; }
+    .sheets-table td { padding:12px 16px;font-family:var(--font-mono);color:var(--text);border-bottom:1px solid var(--border); }
+    .sheets-table tbody tr:nth-child(even) { background:rgba(255,255,255,.02); }
+    .sheets-table tbody tr:hover { background:rgba(0,200,255,.06); }
+
+    .empty-state { flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;color:var(--muted);font-family:var(--font-mono);font-size:12px;padding:80px 20px; }
+    .es-icon-wrap { position:relative;width:88px;height:88px;margin-bottom:32px; }
+    .es-icon-box { position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 40% 35%,rgba(0,200,255,.12),rgba(1,169,130,.06) 60%,transparent);border:1px solid rgba(0,200,255,.2);display:flex;align-items:center;justify-content:center; }
+    .es-title { font-size:14px;font-weight:600;color:var(--text);letter-spacing:.06em;margin-bottom:10px;text-align:center; }
+    .es-sub { font-size:12px;color:var(--muted);text-align:center;line-height:1.9;margin-bottom:28px; }
+    .es-hints { display:flex;gap:12px;flex-wrap:wrap;justify-content:center; }
+    .es-hint { font-size:10px;padding:6px 16px;border-radius:100px;border:1px solid var(--border);color:var(--muted);letter-spacing:.06em; }
+    .es-hint span { color:var(--hpe-cyan);margin-right:5px; }
+    .spinner { width:32px;height:32px;border:2px solid var(--border);border-top-color:var(--hpe-cyan);border-radius:50%;animation:spin .7s linear infinite; }
+
+    .toast { position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--panel);border-radius:12px;padding:12px 22px;font-size:12px;font-family:var(--font-mono);display:flex;align-items:center;gap:10px;border:1px solid;z-index:9999;white-space:nowrap;backdrop-filter:blur(20px);opacity:0;pointer-events:none;transition:all .3s cubic-bezier(.22,1,.36,1); }
+    .toast.show { opacity:1;transform:translateX(-50%) translateY(0); }
+    .toast.info { border-color:var(--border-bright);color:var(--text-secondary); }
+    .toast.success { border-color:rgba(1,169,130,.4);color:var(--hpe-green);box-shadow:0 0 24px rgba(1,169,130,.15); }
+    .toast.error { border-color:rgba(255,107,107,.4);color:var(--warn);box-shadow:0 0 24px rgba(255,107,107,.1); }
+    @keyframes slideUp { from{transform:translateY(10px);opacity:0;} }
+
+    .reveal { opacity:0;transform:translateY(24px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1); }
+    .reveal.visible { opacity:1;transform:translateY(0); }
+    .reveal-delay-1 { transition-delay:.1s; }
+    .reveal-delay-2 { transition-delay:.2s; }
+    .reveal-delay-3 { transition-delay:.3s; }
+  </style>
+</head>
+<body>
+
+<div class="aurora"><div class="aurora-blob"></div><div class="aurora-blob"></div><div class="aurora-blob"></div></div>
+<div class="grid-overlay"></div>
+<div class="noise"></div>
+
+<header class="header">
+  <div class="logo-area" onclick="window.location.href='/GreenLakeTools.html'">
+    <div class="hpe-badge"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z"/></svg></div>
+    <div class="logo-text-group">
+      <div class="logo-eyebrow">HPE GreenLake</div>
+      <div class="logo-name">Platform <em>Tools</em></div>
+    </div>
+  </div>
+  <nav class="header-nav">
+    <div class="nav-pill"><div class="status-dot"></div>Module 03</div>
+    <div class="nav-pill">v1.0.0 — LOCAL</div>
+    <a href="/GreenLakeTools.html" class="nav-pill" style="text-decoration:none;cursor:pointer;">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Home
+    </a>
+  </nav>
+</header>
+
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-header-title">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M12 1v3m0 16v3m-9.07-4.93a10 10 0 0 1 0-14.14M1 12h3m16 0h3"/></svg>
+      Configuration
+    </div>
+  </div>
+  <div class="sidebar-body">
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Request Headers</div>
+      <div class="sidebar-status-row">
+        <span class="sidebar-status-label">Status</span>
+        <span class="headers-status unset" id="headers-status">NOT SET</span>
+      </div>
+      <span class="headers-hint" style="display:block;margin-bottom:10px;">// Paste raw headers — Authorization and Cookie extracted automatically</span>
+      <textarea class="headers-textarea" id="raw-headers"
+        placeholder="# authorization&#10;# Bearer eyJhbG...&#10;# cookie&#10;# notice_preferences=...; ..."
+        oninput="toggleApplyActive(this.value)"
+        style="min-height:110px;max-height:180px;"></textarea>
+      <div style="display:flex;gap:8px;margin-top:12px;">
+        <button class="btn btn-ghost btn-sm" style="flex:1;" onclick="clearHeaders()">CLEAR</button>
+        <button class="btn btn-primary btn-sm" id="apply-btn" style="flex:2;" onclick="applyHeaders()">APPLY</button>
+      </div>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Username</div>
+      <span class="headers-hint" style="display:block;margin-bottom:8px;">// HPE GreenLake user email (e.g. user@hpe.com)</span>
+      <input type="text" class="username-input" id="sidebar-username" placeholder="user@hpe.com" oninput="syncUsername()" />
+    </div>
+  </div>
+</div>
+<button class="sidebar-toggle-tab" id="sidebar-tab" onclick="toggleSidebar()">
+  <span class="tab-arrow"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg></span>
+</button>
+
+<div class="page" id="main-page">
+  <div class="page-wrap">
+    <div class="page-hero reveal">
+      <div>
+        <div class="page-overline">Module 03</div>
+        <h1 class="page-title">User & Account <em>Management</em></h1>
+        <p class="page-subtitle">Fetch workspace hierarchy (Standalone, MSP, Tenants) for a user across the HPE GreenLake platform.</p>
+      </div>
+      <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);text-align:right;padding-bottom:6px;">
+        Total Workspaces<br/>
+        <span style="font-size:44px;font-weight:700;color:var(--hpe-cyan);line-height:1.15;letter-spacing:-.02em;" id="sidebar-total-count">—</span>
+      </div>
+    </div>
+
+    <div class="input-card reveal reveal-delay-1" id="input-card">
+      <div class="input-body">
+        <div class="input-label">
+          <div class="input-label-dot"></div>
+          <span>Username (HPE GreenLake email)</span>
+        </div>
+        <input type="text" class="username-input" id="username-input" placeholder="e.g. syed-masood.hussain@hpe.com" style="min-height:48px;" oninput="toggleFetchActive()" />
+        <div class="input-actions-row">
+          <span class="input-hint">Enter the user email to fetch their workspace hierarchy · <span style="color:var(--hpe-cyan)">Ctrl+Enter</span> to fetch</span>
+          <div class="btn-group">
+            <button class="btn btn-primary" id="fetch-btn" onclick="runFetch()">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              Fetch Workspaces
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-row reveal reveal-delay-2" id="view-cards" style="display:none">
+      <div class="view-card standalone-card active-card" id="vc-standalone" onclick="selectViewCard('standalone')">
+        <div class="vc-label"><span class="vc-dot" style="background:var(--hpe-green);box-shadow:0 0 6px var(--hpe-green)"></span>Standalone</div>
+        <div class="vc-count" id="stat-standalone">0</div>
+        <div class="vc-pct" id="stat-standalone-pct">0%</div>
+        <div class="vc-bar"><div class="vc-fill" id="bar-standalone" style="background:var(--hpe-green)"></div></div>
+      </div>
+      <div class="view-card msp-card" id="vc-msp" onclick="selectViewCard('msp')">
+        <div class="vc-label"><span class="vc-dot" style="background:var(--hpe-cyan);box-shadow:0 0 6px var(--hpe-cyan)"></span>MSP</div>
+        <div class="vc-count" id="stat-msp">0</div>
+        <div class="vc-pct" id="stat-msp-pct">0%</div>
+        <div class="vc-bar"><div class="vc-fill" id="bar-msp" style="background:var(--hpe-cyan)"></div></div>
+      </div>
+      <div class="view-card tenant-card" id="vc-tenant" onclick="selectViewCard('tenant')">
+        <div class="vc-label"><span class="vc-dot" style="background:var(--hpe-purple);box-shadow:0 0 6px var(--hpe-purple)"></span>Tenants</div>
+        <div class="vc-count" id="stat-tenant">0</div>
+        <div class="vc-pct" id="stat-tenant-pct">0%</div>
+        <div class="vc-bar"><div class="vc-fill" id="bar-tenant" style="background:var(--hpe-purple)"></div></div>
+      </div>
+    </div>
+
+    <div class="auth-error-banner" id="auth-error-banner">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <div class="auth-error-banner-body">
+        <div class="auth-error-banner-title">⚠ Authentication Failed</div>
+        <div class="auth-error-banner-msg" id="auth-error-msg">Your Authorization / Cookie headers are expired or invalid. Please update and try again.</div>
+      </div>
+      <button class="auth-error-banner-close" onclick="dismissAuthError()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="results-card reveal reveal-delay-3" id="results-wrap">
+      <div class="results-toolbar">
+        <div class="results-toolbar-left">
+          <span class="results-title">Workspace Hierarchy</span>
+        </div>
+        <div class="results-toolbar-right">
+          <div class="view-switcher" id="view-switcher" style="display:none">
+            <button class="view-switcher-btn active" data-view="view-ui" onclick="setView('view-ui')">View as UI</button>
+            <button class="view-switcher-btn" data-view="view-sheets" onclick="setView('view-sheets')">View as Sheets</button>
+          </div>
+          <button class="btn btn-success btn-sm" onclick="exportCSV()" id="export-btn" style="display:none">↓ Export CSV</button>
+        </div>
+      </div>
+
+      <div style="flex:1;overflow:auto;padding:20px;">
+        <div class="empty-state" id="empty-state">
+          <div class="es-icon-wrap">
+            <div class="es-icon-box">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--hpe-cyan)" stroke-width="1.5" opacity=".7">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </div>
+          </div>
+          <div class="es-title">NO RESULTS YET</div>
+          <div class="es-sub">Set your headers, enter username, and hit <strong style="color:var(--text)">Fetch Workspaces</strong></div>
+          <div class="es-hints">
+            <div class="es-hint"><span>①</span> SET HEADERS</div>
+            <div class="es-hint"><span>②</span> ENTER USERNAME</div>
+            <div class="es-hint"><span>③</span> FETCH</div>
+          </div>
+        </div>
+
+        <div id="loading-state" style="display:none;" class="empty-state">
+          <div class="spinner" style="margin-bottom:20px;"></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;max-width:360px;">
+            <div style="display:flex;justify-content:space-between;width:100%;font-family:var(--font-mono);font-size:11px;">
+              <span id="loading-msg" style="color:var(--text-secondary);">Fetching workspaces...</span>
+              <span id="loading-pct" style="color:var(--hpe-cyan);font-weight:600;">0%</span>
+            </div>
+            <div style="width:100%;height:3px;background:var(--border);border-radius:2px;overflow:hidden;">
+              <div id="loading-bar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--hpe-cyan),var(--hpe-green));border-radius:2px;transition:width .3s ease;"></div>
+            </div>
+            <button class="btn btn-ghost btn-sm" id="stop-btn" onclick="stopFetch()" style="margin-top:10px;">Stop</button>
+          </div>
+        </div>
+
+        <div id="hierarchy-content" style="display:none;">
+          <div id="view-ui" class="view-panel active"></div>
+          <div id="view-sheets" class="view-panel">
+            <div class="hierarchy-section">
+              <h3>All Workspaces (Sheets View)</h3>
+              <div class="sheets-wrap">
+                <table class="sheets-table" id="sheets-table">
+                  <thead><tr><th>Type</th><th>Name</th><th>ID</th><th>Status</th><th>Parent ID</th></tr></thead>
+                  <tbody id="sheets-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const revObs = new IntersectionObserver(entries => entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); }), { threshold:.1 });
+document.querySelectorAll('.reveal').forEach(el => revObs.observe(el));
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('collapsed');
+  document.getElementById('main-page').classList.toggle('sidebar-collapsed');
+}
+
+document.addEventListener('keydown', e => { if (e.ctrlKey && e.key === 'Enter') runFetch(); });
+
+let state = { parsedHeaders: {}, results: null, currentView: 'view-ui' };
+const API_BASE = (window.location.origin || 'http://localhost:5000') + '/api';
+
+function syncUsername() {
+  document.getElementById('username-input').value = document.getElementById('sidebar-username').value;
+  toggleFetchActive();
+}
+
+function toggleFetchActive() {
+  const u = document.getElementById('username-input').value.trim();
+  document.getElementById('fetch-btn').classList.toggle('has-input', u.length > 0);
+}
+
+function applyHeaders() {
+  const raw = document.getElementById('raw-headers').value.trim();
+  if (!raw) { showToast('Paste your headers first.', 'error'); return; }
+  const parsed = parseRawHeaders(raw);
+  const keys = Object.keys(parsed).filter(k => k !== 'Accept');
+  if (!parsed.Authorization && !parsed.Cookie) { showToast('No Authorization or Cookie found — check format.', 'error'); return; }
+  state.parsedHeaders = parsed;
+  document.getElementById('headers-status').textContent = keys.join(' + ') + ' SET';
+  document.getElementById('headers-status').className = 'headers-status set';
+  document.getElementById('apply-btn').classList.remove('is-active');
+  dismissAuthError();
+  showToast('Headers applied.', 'success');
+}
+
+function clearHeaders() {
+  document.getElementById('raw-headers').value = '';
+  document.getElementById('apply-btn').classList.remove('is-active');
+  state.parsedHeaders = {};
+  document.getElementById('headers-status').textContent = 'NOT SET';
+  document.getElementById('headers-status').className = 'headers-status unset';
+  dismissAuthError();
+  showToast('Headers cleared.', 'info');
+}
+
+function parseRawHeaders(raw) {
+  const lines = raw.split('\n'), headers = {};
+  let currentKey = null, currentValue = [];
+  for (let line of lines) {
+    line = line.trim().replace(/^#+\s*/, '').trim();
+    if (!line) continue;
+    if (line.toLowerCase() === 'authorization') { if (currentKey && currentValue.length) headers[currentKey] = currentValue.join(' '); currentKey = 'Authorization'; currentValue = []; }
+    else if (line.toLowerCase() === 'cookie') { if (currentKey && currentValue.length) headers[currentKey] = currentValue.join(' '); currentKey = 'Cookie'; currentValue = []; }
+    else { if (currentKey) currentValue.push(line); }
+  }
+  if (currentKey && currentValue.length) headers[currentKey] = currentValue.join(' ');
+  headers['Accept'] = 'application/json';
+  return headers;
+}
+
+function toggleApplyActive(val) { document.getElementById('apply-btn').classList.toggle('is-active', (val||'').trim().length > 0); }
+
+let currentAbortController = null;
+
+function stopFetch() {
+  if (currentAbortController) { currentAbortController.abort(); currentAbortController = null; }
+  setLoading(false);
+  showToast('Fetch stopped.', 'info');
+}
+
+async function runFetch() {
+  const username = document.getElementById('username-input').value.trim();
+  if (!username) { showToast('Please enter a username (HPE email).', 'error'); return; }
+  if (currentAbortController) currentAbortController.abort();
+  currentAbortController = new AbortController();
+  document.getElementById('empty-state').style.display = 'none';
+  document.getElementById('hierarchy-content').style.display = 'none';
+  setLoading(true);
+  updateProgress(0, 'Fetching workspaces...');
+  try {
+    const res = await fetch(`${API_BASE}/workspace-stream`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ parsed_headers: state.parsedHeaders, username }),
+      signal: currentAbortController.signal,
+    });
+    if (!res.ok) { const err = await res.json(); throw new Error(err.error || 'API error'); }
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+      for (const line of lines) {
+        if (!line.startsWith('data:')) continue;
+        const json = line.slice(5).trim();
+        if (!json) continue;
+        try {
+          const msg = JSON.parse(json);
+          if (msg.type === 'progress') updateProgress(msg.pct, msg.phase === 'fetch' ? `Fetched ${msg.fetched || 0} workspaces...` : `Processing ${msg.processed || 0}/${msg.total || 0}...`);
+          else if (msg.type === 'done') {
+            state.results = msg.data;
+            renderResults(msg.data);
+          } else if (msg.type === 'auth_error') { showAuthError(msg.message); setLoading(false); return; }
+          else if (msg.type === 'error') throw new Error(msg.error);
+        } catch (e) {}
+      }
+    }
+  } catch (err) {
+    if (err.name !== 'AbortError') showToast('Error: ' + err.message + ' — Make sure the Flask server is running.', 'error');
+  } finally { currentAbortController = null; setLoading(false); }
+}
+
+function updateProgress(pct, msg) {
+  document.getElementById('loading-bar').style.width = pct + '%';
+  document.getElementById('loading-pct').textContent = pct + '%';
+  document.getElementById('loading-msg').textContent = msg || 'Processing...';
+}
+
+function renderResults(data) {
+  const h = data.hierarchy || {};
+  const total = data.total || 0;
+  const saCount = data.standalone_count || (h.standalone || []).length;
+  const mspCount = data.msp_count || Object.keys(h.msp_dict || {}).length;
+  const tenantCount = data.tenant_count || Object.values(h.tenant_map || {}).reduce((a, v) => a + v.length, 0);
+
+  document.getElementById('sidebar-total-count').textContent = total;
+  document.getElementById('stat-standalone').textContent = saCount;
+  document.getElementById('stat-msp').textContent = mspCount;
+  document.getElementById('stat-tenant').textContent = tenantCount;
+  const totalAll = saCount + mspCount + tenantCount;
+  const pct = totalAll ? (v) => Math.round((v / totalAll) * 100) : () => 0;
+  document.getElementById('stat-standalone-pct').textContent = pct(saCount) + '%';
+  document.getElementById('stat-msp-pct').textContent = pct(mspCount) + '%';
+  document.getElementById('stat-tenant-pct').textContent = pct(tenantCount) + '%';
+  document.getElementById('view-cards').style.display = 'grid';
+  setTimeout(() => {
+    document.getElementById('bar-standalone').style.width = pct(saCount) + '%';
+    document.getElementById('bar-msp').style.width = pct(mspCount) + '%';
+    document.getElementById('bar-tenant').style.width = pct(tenantCount) + '%';
+  }, 50);
+
+  let uiHtml = '';
+  if ((h.standalone || []).length) {
+    uiHtml += '<div class="hierarchy-section"><h3>Stand Alone Workspaces</h3><table class="hierarchy-table"><thead><tr><th>Name</th><th>ID</th><th>Status</th></tr></thead><tbody>';
+    for (const sa of h.standalone) {
+      uiHtml += `<tr><td>${escapeHtml(sa.name)}</td><td><code style="font-size:11px;color:var(--muted)">${escapeHtml(sa.customer_id)}</code></td><td><span class="badge" style="background:${sa.color}">${escapeHtml(sa.status)}</span></td></tr>`;
+    }
+    uiHtml += '</tbody></table></div>';
+  }
+  if (Object.keys(h.msp_dict || {}).length) {
+    uiHtml += '<div class="hierarchy-section"><h3>MSP Workspaces</h3><table class="hierarchy-table"><thead><tr><th>MSP Name</th><th>MSP ID</th><th>Status</th><th>Tenants</th></tr></thead><tbody>';
+    for (const [mspId, msp] of Object.entries(h.msp_dict)) {
+      const tenants = (h.tenant_map || {})[mspId] || [];
+      const tid = 'tenant_' + mspId.replace(/[^a-zA-Z0-9]/g, '_');
+      let tenantHtml = '';
+      if (tenants.length) {
+        tenantHtml = `<button class="toggle-btn" onclick="toggleTenants('${tid}')"><span id="arrow-${tid}">▶</span> View Tenants (${tenants.length})</button>`;
+        tenantHtml += `<div id="${tid}" class="tenant-wrapper"><table class="hierarchy-table"><thead><tr><th>Tenant Name</th><th>ID</th><th>Status</th></tr></thead><tbody>`;
+        for (const t of tenants) {
+          tenantHtml += `<tr><td>${escapeHtml(t.name)}</td><td><code style="font-size:11px;color:var(--muted)">${escapeHtml(t.customer_id)}</code></td><td><span class="badge" style="background:${t.color}">${escapeHtml(t.status)}</span></td></tr>`;
+        }
+        tenantHtml += '</tbody></table></div>';
+      } else {
+        tenantHtml = 'No Tenants';
+      }
+      uiHtml += `<tr><td>${escapeHtml(msp.name)}</td><td><code style="font-size:11px;color:var(--muted)">${escapeHtml(mspId)}</code></td><td><span class="badge" style="background:${msp.color}">${escapeHtml(msp.status)}</span></td><td>${tenantHtml}</td></tr>`;
+    }
+    uiHtml += '</tbody></table></div>';
+  }
+  document.getElementById('view-ui').innerHTML = uiHtml || '<div class="hierarchy-section"><p style="color:var(--muted)">No workspaces found.</p></div>';
+
+  const tbody = document.getElementById('sheets-tbody');
+  tbody.innerHTML = '';
+  for (const row of (h.sheets_rows || [])) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${escapeHtml(row.type)}</td><td>${escapeHtml(row.name)}</td><td><code style="font-size:11px;color:var(--muted)">${escapeHtml(row.id)}</code></td><td><span class="badge" style="background:${row.color}">${escapeHtml(row.status)}</span></td><td>${escapeHtml(row.parent_id || '')}</td>`;
+    tbody.appendChild(tr);
+  }
+
+  document.getElementById('empty-state').style.display = 'none';
+  document.getElementById('hierarchy-content').style.display = 'block';
+  document.getElementById('view-switcher').style.display = 'flex';
+  document.getElementById('export-btn').style.display = '';
+  setView('view-ui');
+}
+
+function escapeHtml(s) {
+  if (s == null) return '';
+  const d = document.createElement('div');
+  d.textContent = String(s);
+  return d.innerHTML;
+}
+
+function toggleTenants(id) {
+  const el = document.getElementById(id);
+  const arrow = document.getElementById('arrow-' + id);
+  if (el.style.display === 'none') {
+    el.style.display = 'block';
+    if (arrow) arrow.textContent = '▼';
+  } else {
+    el.style.display = 'none';
+    if (arrow) arrow.textContent = '▶';
+  }
+}
+
+function setView(viewId) {
+  state.currentView = viewId;
+  document.querySelectorAll('.view-panel').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.view-switcher-btn').forEach(btn => btn.classList.remove('active'));
+  document.getElementById(viewId).classList.add('active');
+  const btn = document.querySelector('.view-switcher-btn[data-view="' + viewId + '"]');
+  if (btn) btn.classList.add('active');
+}
+
+function selectViewCard(v) {
+  document.getElementById('vc-standalone').classList.toggle('active-card', v === 'standalone');
+  document.getElementById('vc-msp').classList.toggle('active-card', v === 'msp');
+  document.getElementById('vc-tenant').classList.toggle('active-card', v === 'tenant');
+}
+
+function exportCSV() {
+  if (!state.results || !state.results.hierarchy) { showToast('No results to export.', 'error'); return; }
+  const rows = state.results.hierarchy.sheets_rows || [];
+  let csv = '"Type","Name","ID","Status","Parent ID"\n';
+  for (const r of rows) {
+    csv += `"${(r.type||'').replace(/"/g,'""')}","${(r.name||'').replace(/"/g,'""')}","${(r.id||'').replace(/"/g,'""')}","${(r.status||'').replace(/"/g,'""')}","${(r.parent_id||'').replace(/"/g,'""')}"\n`;
+  }
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'workspace_hierarchy.csv'; a.click();
+  URL.revokeObjectURL(url);
+  showToast('Exported ' + rows.length + ' rows.', 'success');
+}
+
+function setLoading(on) {
+  document.getElementById('fetch-btn').disabled = on;
+  if (on) document.getElementById('fetch-btn').classList.remove('has-input');
+  document.getElementById('empty-state').style.display = on ? 'none' : (state.results ? 'none' : 'flex');
+  document.getElementById('loading-state').style.display = on ? 'flex' : 'none';
+  document.getElementById('hierarchy-content').style.display = on ? 'none' : (state.results ? 'block' : 'none');
+}
+
+function showAuthError(msg) {
+  const banner = document.getElementById('auth-error-banner');
+  if (msg) document.getElementById('auth-error-msg').textContent = msg;
+  banner.classList.add('visible');
+}
+
+function dismissAuthError() {
+  document.getElementById('auth-error-banner').classList.remove('visible');
+}
+
+let toastTimer;
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.className = 'toast ' + (type || 'info');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3200);
+}
+</script>
+</body>
+</html>
