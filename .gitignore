@@ -1,0 +1,38 @@
+# Backup files
+*.bak
+*.backup
+
+# Screenshots and images (unless intentionally added)
+*.png
+*.jpg
+*.jpeg
+*.gif
+
+# Windows shortcuts
+*.lnk
+
+# Temp files
+Untitled
+*.tmp
+*.temp
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+env/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
