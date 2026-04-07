@@ -561,6 +561,94 @@
     .reveal-delay-1 { transition-delay:.1s; }
     .reveal-delay-2 { transition-delay:.2s; }
     .reveal-delay-3 { transition-delay:.3s; }
+
+    /* ─── MISSING INFO BANNER ─────────────────────────────────── */
+    .missing-info-banner {
+      display:none;padding:6px 20px 8px;border-bottom:1px solid rgba(255,107,107,.15);
+    }
+    .missing-info-inner {
+      display:flex;align-items:center;gap:8px;background:rgba(255,107,107,.05);
+      border:1px solid rgba(255,107,107,.15);border-radius:10px;padding:8px 14px;
+      font-size:11px;color:var(--text);line-height:1.5;font-family:var(--font-mono);
+    }
+    .missing-info-inner svg { flex-shrink:0;color:var(--warn);opacity:.8; }
+
+    /* ─── MODAL OVERLAY ───────────────────────────────────────── */
+    .modal-overlay {
+      position:fixed;inset:0;z-index:9999;
+      background:rgba(5,8,16,.7);backdrop-filter:blur(6px);
+      display:none;align-items:center;justify-content:center;
+    }
+    .modal-overlay.open { display:flex; }
+    .modal-box {
+      background:var(--panel);border:1px solid var(--border-bright);
+      border-radius:16px;width:440px;max-width:92vw;
+      box-shadow:0 12px 48px rgba(0,0,0,.5),0 0 0 1px rgba(1,169,130,.08);
+      animation:modalIn .22s cubic-bezier(.22,1,.36,1);
+    }
+    @keyframes modalIn { from{opacity:0;transform:scale(.95) translateY(8px);} to{opacity:1;transform:scale(1) translateY(0);} }
+    .modal-header {
+      display:flex;align-items:center;gap:12px;
+      padding:20px 24px 16px;border-bottom:1px solid var(--border);
+    }
+    .modal-header svg { color:var(--hpe-green);flex-shrink:0; }
+    .modal-title { font-family:var(--font-mono);font-size:13px;font-weight:600;color:var(--text);letter-spacing:.04em; }
+    .modal-body { padding:20px 24px; }
+    .modal-body p { font-size:12px;color:var(--text-secondary);line-height:1.7;margin:0 0 12px; }
+    .modal-preview {
+      background:var(--surface);border:1px solid var(--border);border-radius:8px;
+      padding:12px 14px;font-family:var(--font-mono);font-size:11px;
+      color:var(--hpe-cyan);line-height:1.6;max-height:80px;overflow:hidden;position:relative;
+    }
+    .modal-preview::after {
+      content:'';position:absolute;bottom:0;left:0;right:0;
+      height:28px;background:linear-gradient(transparent,var(--surface));
+    }
+    .modal-filename-wrap { margin-top:16px; }
+    .modal-filename-label {
+      font-family:var(--font-mono);font-size:11px;color:var(--muted);
+      letter-spacing:.04em;margin-bottom:8px;display:block;
+    }
+    .modal-filename-row {
+      display:flex;align-items:center;
+      background:var(--surface);border:1px solid var(--border);
+      border-radius:8px;overflow:hidden;transition:border-color .2s,box-shadow .2s;
+    }
+    .modal-filename-row:focus-within {
+      border-color:var(--hpe-green);box-shadow:0 0 0 3px rgba(1,169,130,.09);
+    }
+    .modal-filename-input {
+      flex:1;background:transparent;border:none;outline:none;
+      font-family:var(--font-mono);font-size:12px;color:var(--text);
+      padding:10px 14px;min-width:0;
+    }
+    .modal-filename-input::placeholder { color:var(--muted); }
+    .modal-filename-ext {
+      font-family:var(--font-mono);font-size:11px;color:var(--muted);
+      padding:10px 14px 10px 0;white-space:nowrap;flex-shrink:0;
+    }
+    .modal-filename-warn {
+      font-family:var(--font-mono);font-size:10px;color:var(--warn);
+      margin-top:8px;display:none;align-items:center;gap:5px;
+    }
+    .modal-filename-warn.visible { display:flex; }
+    .modal-footer {
+      display:flex;gap:10px;justify-content:flex-end;
+      padding:16px 24px;border-top:1px solid var(--border);
+    }
+    .modal-btn-cancel {
+      background:transparent;color:var(--muted);border:1px solid var(--border);
+      font-family:var(--font-mono);font-size:11px;font-weight:600;
+      padding:8px 18px;border-radius:8px;cursor:pointer;transition:all .15s;
+    }
+    .modal-btn-cancel:hover { border-color:var(--text-secondary);color:var(--text); }
+    .modal-btn-confirm {
+      background:transparent;color:var(--hpe-green);border:1px solid rgba(1,169,130,.4);
+      font-family:var(--font-mono);font-size:11px;font-weight:600;
+      padding:8px 18px;border-radius:8px;cursor:pointer;transition:all .15s;
+    }
+    .modal-btn-confirm:hover:not(:disabled) { background:var(--hpe-green);color:#000;box-shadow:0 8px 24px rgba(1,169,130,.3); }
+    .modal-btn-confirm:disabled { opacity:.35;cursor:not-allowed; }
   </style>
 </head>
 <body>
@@ -628,11 +716,13 @@
       <div class="sidebar-section-label">Export Columns</div>
       <div class="sidebar-col-item" onclick="toggleCol('Serial Number')"><div class="cb checked" id="cb-Serial Number"></div>Serial Number</div>
       <div class="sidebar-col-item" onclick="toggleCol('MAC Address')"><div class="cb checked" id="cb-MAC Address"></div>MAC Address</div>
+      <div class="sidebar-col-item" onclick="toggleCol('Entitlement ID')"><div class="cb" id="cb-Entitlement ID"></div>Entitlement ID</div>
       <div class="sidebar-col-item" onclick="toggleCol('Device Type')"><div class="cb" id="cb-Device Type"></div>Device Type</div>
       <div class="sidebar-col-item" onclick="toggleCol('Device Model')"><div class="cb" id="cb-Device Model"></div>Device Model</div>
       <div class="sidebar-col-item" onclick="toggleCol('Part Number')"><div class="cb" id="cb-Part Number"></div>Part Number</div>
       <div class="sidebar-col-item" onclick="toggleCol('Folder Name')"><div class="cb checked" id="cb-Folder Name"></div>Folder Name</div>
-      <div class="sidebar-col-item" onclick="toggleCol('Platform ID')"><div class="cb checked" id="cb-Platform ID"></div>Platform ID</div>
+      <div class="sidebar-col-item" onclick="toggleCol('Workspace ID')"><div class="cb checked" id="cb-Workspace ID"></div>Workspace ID</div>
+      <div class="sidebar-col-item" onclick="toggleCol('Workspace Name')"><div class="cb checked" id="cb-Workspace Name"></div>Workspace Name</div>
     </div>
 
   </div>
@@ -672,6 +762,10 @@
         <div class="lookup-tab" id="tab-mac" onclick="setLookupType('mac')">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/></svg>
           MAC Address
+        </div>
+        <div class="lookup-tab" id="tab-workspace" onclick="setLookupType('workspace')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+          Workspace ID
         </div>
       </div>
 
@@ -739,7 +833,7 @@
         <div class="results-toolbar-right">
           <div class="search-wrap">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <input class="search-input" id="search-input" placeholder="Search results..." oninput="filterTable();toggleSearchClear('search-clear',this.value)" />
+            <input class="search-input" id="search-input" placeholder="Search results..." oninput="debounceFilter();toggleSearchClear('search-clear',this.value)" />
             <button class="search-clear" id="search-clear" onclick="clearSearch('search-input');filterTable()" style="display:none">
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
@@ -752,6 +846,10 @@
             <span class="filter-trigger-badge" id="filter-trigger-badge"></span>
           </button>
 
+          <button class="btn btn-ghost btn-sm" onclick="openComposedModal()" id="composed-export-btn" style="display:none">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Composed Export
+          </button>
           <button class="btn btn-success btn-sm" onclick="exportCSV('found')" id="export-found-btn" style="display:none">↓ Export Found</button>
           <button class="btn btn-danger btn-sm" onclick="exportCSV('missing')" id="export-missing-btn" style="display:none">↓ Export Missing</button>
           <button class="btn btn-ghost btn-sm" id="maximize-btn" onclick="openFullscreen()" style="display:none">
@@ -761,6 +859,18 @@
         </div>
       </div>
 
+      <div class="missing-info-banner" id="missing-info-banner">
+        <div class="missing-info-inner">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span>These devices could not be found. Possible reasons: <b style="color:var(--text)">incorrect serial/MAC</b>, device is <b style="color:var(--text)">not on the GreenLake platform</b>, or it may be part of a <b style="color:var(--text)">serial bundle</b>.</span>
+        </div>
+      </div>
+      <div class="missing-info-banner" id="missing-info-banner">
+        <div class="missing-info-inner">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span>These devices could not be found. Possible reasons: <b style="color:var(--text)">incorrect serial/MAC</b>, device is <b style="color:var(--text)">not on GreenLake platform</b>, or part of a <b style="color:var(--text)">serial bundle</b>.</span>
+        </div>
+      </div>
       <div class="table-scroll" id="table-scroll">
         <div class="empty-state" id="empty-state">
           <div class="es-icon-wrap">
@@ -845,6 +955,10 @@
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
+      <button class="btn btn-ghost btn-sm" onclick="openComposedModal(true)" id="fs-composed-export-btn">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Composed
+      </button>
       <button class="btn btn-ghost btn-sm" id="fs-export-btn" onclick="exportCSV(state.view)">↓ Export</button>
       <button class="btn btn-ghost btn-sm" onclick="closeFullscreen()">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 0 2-2h3M3 16h3a2 2 0 0 0 2 2v3"/></svg>
@@ -853,11 +967,37 @@
     </div>
   </div>
   <div class="fs-body">
+    <div class="missing-info-banner" id="fs-missing-info-banner">
+      <div class="missing-info-inner">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span>These devices could not be found. Possible reasons: <b style="color:var(--text)">incorrect serial/MAC</b>, device is <b style="color:var(--text)">not on GreenLake platform</b>, or part of a <b style="color:var(--text)">serial bundle</b>.</span>
+      </div>
+    </div>
     <div class="fs-table-scroll" id="fs-table-scroll">
       <table id="fs-result-table" style="width:100%;border-collapse:collapse;font-size:12px;">
         <thead id="fs-table-head"></thead>
         <tbody id="fs-table-body"></tbody>
       </table>
+    </div>
+    <div class="pagination-bar" id="fs-pagination-bar" style="display:none">
+      <div class="page-size-group">
+        <span class="page-size-label">Rows per page</span>
+        <div class="page-size-btns">
+          <button class="page-size-btn active" onclick="setFsPageSize(10)">10</button>
+          <button class="page-size-btn" onclick="setFsPageSize(50)">50</button>
+          <button class="page-size-btn" onclick="setFsPageSize(100)">100</button>
+        </div>
+      </div>
+      <div class="page-nav">
+        <button class="page-nav-btn" id="fs-btn-prev" onclick="goToFsPage(state.fsCurrentPage-1)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="page-numbers" id="fs-page-numbers"></div>
+        <button class="page-nav-btn" id="fs-btn-next" onclick="goToFsPage(state.fsCurrentPage+1)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+      <div class="page-info" id="fs-page-info"></div>
     </div>
   </div>
 </div>
@@ -885,6 +1025,63 @@
         <button class="filter-clear-all" id="filter-clear-all" onclick="clearAllFilters()">✕ Clear All</button>
         <button class="filter-apply-btn" onclick="closeFilterDrawer()">Apply & Close</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Composed Export Modal -->
+<div class="modal-overlay" id="composed-modal-overlay" onclick="if(event.target===this)closeComposedModal()">
+  <div class="modal-box">
+    <div class="modal-header">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <span class="modal-title" id="composed-modal-title">Composed Export</span>
+    </div>
+    <div class="modal-body">
+      <div class="modal-filename-wrap" style="margin-top:0;">
+        <span class="modal-filename-label">Enter the name of the file:</span>
+        <div class="modal-filename-row">
+          <input class="modal-filename-input" id="composed-filename-input" type="text" placeholder="e.g. composed_serials" spellcheck="false" oninput="onComposedFilenameInput(this.value)" onkeydown="if(event.key==='Enter')confirmComposedExport()" />
+          <span class="modal-filename-ext">.txt</span>
+        </div>
+        <div class="modal-filename-warn" id="composed-filename-warn">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Please enter a file name first.
+        </div>
+      </div>
+      <p style="margin-top:14px;">Downloads a text file containing all Serial Numbers currently visible in the table as a single comma-separated line.</p>
+      <div class="modal-preview" id="composed-preview">—</div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn-cancel" onclick="closeComposedModal()">Cancel</button>
+      <button class="modal-btn-confirm" id="composed-confirm-btn" onclick="confirmComposedExport()" disabled>✓ Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- Export Filename Modal -->
+<div class="modal-overlay" id="export-modal-overlay" onclick="if(event.target===this)closeExportModal()">
+  <div class="modal-box">
+    <div class="modal-header">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <span class="modal-title" id="export-modal-title">Export</span>
+    </div>
+    <div class="modal-body">
+      <p>Enter a name for the file, then click <strong style="color:var(--text)">Confirm</strong> to download.</p>
+      <div class="modal-filename-wrap">
+        <span class="modal-filename-label">File name:</span>
+        <div class="modal-filename-row">
+          <input class="modal-filename-input" id="export-filename-input" type="text" placeholder="e.g. found_devices" spellcheck="false" oninput="onExportFilenameInput(this.value)" onkeydown="if(event.key==='Enter')confirmExport()" />
+          <span class="modal-filename-ext">.csv</span>
+        </div>
+        <div class="modal-filename-warn" id="export-filename-warn">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          Please enter a file name first.
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn-cancel" onclick="closeExportModal()">Cancel</button>
+      <button class="modal-btn-confirm" id="export-confirm-btn" onclick="confirmExport()" disabled>✓ Confirm</button>
     </div>
   </div>
 </div>
@@ -947,6 +1144,10 @@
     if (e.key === 'Escape') closeLightboxOrFullscreen();
   });
   function closeLightboxOrFullscreen() {
+    const composedOv = document.getElementById('composed-modal-overlay');
+    if (composedOv && composedOv.classList.contains('open')) { closeComposedModal(); return; }
+    const exportOv = document.getElementById('export-modal-overlay');
+    if (exportOv && exportOv.classList.contains('open')) { closeExportModal(); return; }
     if (document.getElementById('filter-overlay').classList.contains('open')) { closeFilterDrawer(); return; }
     if (document.getElementById('fs-overlay').classList.contains('open')) closeFullscreen();
   }
@@ -958,17 +1159,21 @@ let state = {
   results: null,
   sortCol: null,
   sortDir: 1,
-  exportCols: new Set(['Serial Number','MAC Address','Folder Name','Platform ID']),
+  exportCols: new Set(['Serial Number','MAC Address','Folder Name','Workspace ID','Workspace Name']),
   parsedHeaders: {},
   filters: {},
   pageSize: 10,
   currentPage: 1,
   totalPages: 1,
+  fsPageSize: 10,
+  fsCurrentPage: 1,
+  fsTotalPages: 1,
 };
 const API_BASE = (window.location.origin || 'http://localhost:5000') + '/api';
+const ALL_COLS = ['Serial Number','MAC Address','Entitlement ID','Device Type','Device Model','Part Number','Folder Name','Workspace ID','Workspace Name'];
 
-// ─── FILTER COLUMNS (checked dynamically from data) ──────────────────────────
-const FILTER_COLS = ['Folder Name','Device Type','Device Model','Part Number'];
+// ─── FILTER COLUMNS ──────────────────────────────────────────────────────────
+const FILTER_COLS = ['Workspace ID','Workspace Name','Folder Name','Device Type','Device Model','Part Number'];
 
 function buildFilterBar(data) {
   const devices = data.devices || [];
@@ -984,6 +1189,7 @@ function buildFilterBar(data) {
 
   let groupCount = 0;
   FILTER_COLS.forEach(col => {
+    if (!state.exportCols.has(col)) return;
     const vals = [...new Set(devices.map(d => (d[col]||'').trim()).filter(v => v && v !== '—'))];
     if (!vals.length) return;
 
@@ -1106,25 +1312,22 @@ function applyFilters(rows) {
 
 function setLookupType(t) {
   state.lookupType = t;
-  document.getElementById('tab-serial').classList.toggle('active', t === 'serial');
-  document.getElementById('tab-mac').classList.toggle('active', t === 'mac');
+  ['serial','mac','workspace'].forEach(id => {
+    const el = document.getElementById('tab-' + id);
+    if (el) el.classList.toggle('active', t === id);
+  });
   const ta = document.getElementById('device-input');
   const lb = document.getElementById('input-type-label');
-  if (t === 'serial') {
-    ta.placeholder = 'Paste 10-digit Serial Numbers — comma or newline separated\ne.g.  AB12345678, CD98765432  or one per line...';
-    lb.textContent = 'Serial Numbers';
-  } else {
-    ta.placeholder = 'Paste MAC Addresses — comma or newline separated\ne.g.  AB:CD:12:34:EF:56, 11:22:33:44:55:66  or one per line...';
-    lb.textContent = 'MAC Addresses';
-  }
+  const configs = {
+    serial:    { placeholder: 'Paste 10-digit Serial Numbers — comma or newline separated\ne.g.  AB12345678, CD98765432  or one per line...', label: 'Serial Numbers' },
+    mac:       { placeholder: 'Paste MAC Addresses — comma or newline separated\ne.g.  AB:CD:12:34:EF:56, 11:22:33:44:55:66  or one per line...', label: 'MAC Addresses' },
+    workspace: { placeholder: 'Paste Workspace ID (Platform Customer ID)\ne.g.  20cb2e7a253b11f0a855...', label: 'Workspace ID' },
+  };
+  ta.placeholder = configs[t]?.placeholder || '';
+  lb.textContent = configs[t]?.label || '';
   ta.value = '';
   document.getElementById('search-input').value = '';
   toggleLookupActive('');
-  document.getElementById('raw-headers').value = '';
-  state.parsedHeaders = {};
-  document.getElementById('headers-status').textContent = 'NOT SET';
-  document.getElementById('headers-status').className = 'headers-status unset';
-  document.getElementById('apply-btn').classList.remove('is-active');
   resetResultState();
 }
 
@@ -1219,8 +1422,11 @@ function stopLookup() {
 function resetResultState() {
   state.results = null; state.view = 'found'; state.sortCol = null; state.sortDir = 1;
   state.filters = {}; state.currentPage = 1; state.totalPages = 1;
+  state.fsCurrentPage = 1; state.fsTotalPages = 1;
 
-  // reset filter modal
+  const fsOverlay = document.getElementById('fs-overlay');
+  if (fsOverlay && fsOverlay.classList.contains('open')) { fsOverlay.classList.remove('open'); document.documentElement.style.overflow = ''; }
+
   const filterGroups = document.getElementById('filter-groups');
   if (filterGroups) filterGroups.innerHTML = '';
   const filterCount = document.getElementById('filter-active-count');
@@ -1241,8 +1447,12 @@ function resetResultState() {
   ['bar-found','bar-missing'].forEach(id => document.getElementById(id).style.width = '0%');
   document.getElementById('export-found-btn').style.display = 'none';
   document.getElementById('export-missing-btn').style.display = 'none';
+  const composedBtn = document.getElementById('composed-export-btn');
+  if (composedBtn) composedBtn.style.display = 'none';
   document.getElementById('maximize-btn').style.display = 'none';
   document.getElementById('search-input').value = '';
+  const sc = document.getElementById('search-clear');
+  if (sc) sc.style.display = 'none';
   document.getElementById('row-count').style.display = 'none';
   document.getElementById('table-title').textContent = 'Results';
   document.getElementById('table-scroll').classList.remove('has-results','missing-scroll');
@@ -1252,6 +1462,10 @@ function resetResultState() {
   document.getElementById('table-body').innerHTML = '';
   const pb = document.getElementById('pagination-bar');
   if (pb) pb.style.display = 'none';
+  const mib = document.getElementById('missing-info-banner');
+  if (mib) mib.style.display = 'none';
+  const fmib = document.getElementById('fs-missing-info-banner');
+  if (fmib) fmib.style.display = 'none';
   dismissAuthError();
 }
 
@@ -1285,13 +1499,19 @@ async function runLookup() {
         if (!json) continue;
         try {
           const msg = JSON.parse(json);
-          if (msg.type==='progress') updateProgress(msg.pct,msg.queried,msg.total,msg.found,msg.batch,msg.total_batches);
+          if (msg.type==='progress') updateProgress(msg.pct,msg.queried,msg.total,msg.found,msg.batch,msg.total_batches,msg.message);
           else if (msg.type==='done') {
             state.results = msg.data;
+            state.filters = {};
             renderStats(msg.data); renderTable(msg.data);
+            buildFilterBar(msg.data);
             document.getElementById('export-found-btn').style.display = '';
             document.getElementById('export-missing-btn').style.display = 'none';
+            const cb = document.getElementById('composed-export-btn');
+            if (cb) cb.style.display = '';
             document.getElementById('maximize-btn').style.display = '';
+            const mc = document.getElementById('vc-missing');
+            if (mc) mc.style.display = state.lookupType === 'workspace' ? 'none' : '';
           } else if (msg.type==='auth_error') { showAuthError(msg.message); setLoading(false); return; }
           else if (msg.type==='error') throw new Error(msg.error);
         } catch(e) {}
@@ -1302,10 +1522,17 @@ async function runLookup() {
   } finally { currentAbortController=null; setLoading(false); }
 }
 
-function updateProgress(pct, queried, total) {
-  document.getElementById('loading-bar').style.width = pct + '%';
-  document.getElementById('loading-pct').textContent = pct + '%';
-  document.getElementById('loading-msg').textContent = queried + ' / ' + total + ' devices queried';
+function updateProgress(pct, queried, total, found, batch, totalBatches, message) {
+  const safePct = pct < 0 ? 0 : pct;
+  document.getElementById('loading-bar').style.width = safePct + '%';
+  document.getElementById('loading-pct').textContent = safePct + '%';
+  if (message) {
+    document.getElementById('loading-msg').textContent = message;
+  } else if (total < 0) {
+    document.getElementById('loading-msg').textContent = 'Fetching page ' + batch + ' — ' + queried + ' devices found so far...';
+  } else {
+    document.getElementById('loading-msg').textContent = queried + ' / ' + total + ' devices queried';
+  }
 }
 
 function renderStats(data) {
@@ -1329,47 +1556,51 @@ function showAuthError(msg) {
 }
 function dismissAuthError() { document.getElementById('auth-error-banner').classList.remove('visible'); }
 
-function buildTableHTML(isMissing, searchVal, data, paginate=true) {
+function buildTableHTML(isMissing, searchVal, data, page, pageSize) {
   const terms = searchVal.split(',').map(t=>t.trim()).filter(t=>t.length>0);
   const matchesTerms = str => terms.length===0 || terms.some(t=>str.toLowerCase().includes(t));
   let headHTML='', bodyHTML='', totalRows=0;
   if (isMissing) {
     const rows = (data.missing||[]).filter(d=>matchesTerms(d));
     totalRows = rows.length;
-    const pageRows = paginate ? rows.slice((state.currentPage-1)*state.pageSize, state.currentPage*state.pageSize) : rows;
+    const pageRows = rows.slice((page-1)*pageSize, page*pageSize);
     headHTML = `<tr><th>Missing Device ID</th><th>Status</th></tr>`;
     bodyHTML = pageRows.map(d=>`<tr><td>${d}</td><td><span class="badge badge-gray">NOT FOUND</span></td></tr>`).join('');
   } else {
-    const allCols=['Serial Number','MAC Address','Device Type','Device Model','Part Number','Folder Name','Platform ID'];
-    const cols=allCols.filter(c=>state.exportCols.has(c));
+    const cols=ALL_COLS.filter(c=>state.exportCols.has(c));
     let rows = applyFilters(data.devices||[]);
     rows = rows.filter(r=>cols.some(c=>matchesTerms((r[c]||'').toString())));
-    const sorted=[...rows];
-    if(state.sortCol) sorted.sort((a,b)=>(a[state.sortCol]||'').toString().localeCompare((b[state.sortCol]||'').toString())*state.sortDir);
-    totalRows = sorted.length;
-    const pageRows = paginate ? sorted.slice((state.currentPage-1)*state.pageSize, state.currentPage*state.pageSize) : sorted;
+    if(state.sortCol) rows=[...rows].sort((a,b)=>(a[state.sortCol]||'').toString().localeCompare((b[state.sortCol]||'').toString())*state.sortDir);
+    totalRows = rows.length;
+    const pageRows = rows.slice((page-1)*pageSize, page*pageSize);
     headHTML=`<tr>${cols.map(c=>`<th class="${state.sortCol===c?'sorted':''}" onclick="sortBy('${c}')">${c} <span class="sort-arrow">${state.sortCol===c?(state.sortDir>0?'↑':'↓'):'↕'}</span></th>`).join('')}</tr>`;
     bodyHTML=pageRows.map(r=>`<tr>${cols.map(c=>{
       if(c==='Device Type') return `<td><span class="badge badge-blue">${r[c]||'—'}</span></td>`;
       if(c==='Folder Name') return `<td><span class="badge badge-green">${r[c]||'—'}</span></td>`;
-      if(c==='Platform ID') return `<td style="color:var(--muted)">${r[c]||''}</td>`;
+      if(c==='Workspace ID') return `<td style="color:var(--muted)">${r[c]||''}</td>`;
+      if(c==='Workspace Name') return `<td style="color:var(--hpe-green)">${r[c]||'—'}</td>`;
+      if(c==='Entitlement ID') return `<td style="color:var(--hpe-cyan)">${r[c]||'—'}</td>`;
       return `<td>${r[c]||'—'}</td>`;
     }).join('')}</tr>`).join('');
   }
-  return { headHTML, bodyHTML, rowCount: totalRows, totalRows };
+  return { headHTML, bodyHTML, totalRows };
 }
 
-function renderPagination(totalRows) {
-  const bar = document.getElementById('pagination-bar');
+function renderPagination(totalRows, barPrefix) {
+  const prefix = barPrefix || '';
+  const bar = document.getElementById(prefix+'pagination-bar');
   if (!bar) return;
   if (totalRows === 0) { bar.style.display='none'; return; }
   bar.style.display='';
-  state.totalPages = Math.max(1, Math.ceil(totalRows / state.pageSize));
-  if (state.currentPage > state.totalPages) state.currentPage = state.totalPages;
-  // page number buttons
-  const pn = document.getElementById('page-numbers');
+  const ps = prefix ? state.fsPageSize : state.pageSize;
+  const cp0 = prefix ? state.fsCurrentPage : state.currentPage;
+  const tp = Math.max(1, Math.ceil(totalRows / ps));
+  if (prefix) { state.fsTotalPages=tp; if(state.fsCurrentPage>tp) state.fsCurrentPage=tp; }
+  else { state.totalPages=tp; if(state.currentPage>tp) state.currentPage=tp; }
+  const cp = prefix ? state.fsCurrentPage : state.currentPage;
+  const pn = document.getElementById(prefix+'page-numbers');
+  if (!pn) return;
   pn.innerHTML = '';
-  const tp = state.totalPages, cp = state.currentPage;
   let pages = [];
   if (tp <= 7) { pages = Array.from({length:tp},(_,i)=>i+1); }
   else {
@@ -1379,6 +1610,7 @@ function renderPagination(totalRows) {
     if (cp<tp-2) pages.push('…');
     pages.push(tp);
   }
+  const goFn = prefix ? 'goToFsPage' : 'goToPage';
   pages.forEach(p => {
     if (p==='…') {
       const s=document.createElement('span');
@@ -1387,48 +1619,49 @@ function renderPagination(totalRows) {
     } else {
       const b=document.createElement('button');
       b.className='page-num-btn'+(p===cp?' active':'');
-      b.textContent=p; b.onclick=()=>goToPage(p);
+      b.textContent=p; b.onclick=()=>window[goFn](p);
       pn.appendChild(b);
     }
   });
-  document.getElementById('btn-prev').disabled = cp<=1;
-  document.getElementById('btn-next').disabled = cp>=tp;
-  const start=(cp-1)*state.pageSize+1, end=Math.min(cp*state.pageSize,totalRows);
-  document.getElementById('page-info').textContent = `${start}–${end} of ${totalRows}`;
-  // sync active page-size button
-  document.querySelectorAll('.page-size-btn').forEach(b=>b.classList.toggle('active',parseInt(b.textContent)===state.pageSize));
+  const prev = document.getElementById(prefix+'btn-prev');
+  const next = document.getElementById(prefix+'btn-next');
+  if(prev) prev.disabled = cp<=1;
+  if(next) next.disabled = cp>=tp;
+  const start=Math.min((cp-1)*ps+1,totalRows), end=Math.min(cp*ps,totalRows);
+  const info = document.getElementById(prefix+'page-info');
+  if(info) info.textContent = `${start}–${end} of ${totalRows}`;
+  const sizeContainer = bar.querySelector('.page-size-btns');
+  if(sizeContainer) sizeContainer.querySelectorAll('.page-size-btn').forEach(b=>b.classList.toggle('active',parseInt(b.textContent)===(prefix?state.fsPageSize:state.pageSize)));
 }
 
-function setPageSize(n) {
-  state.pageSize=n; state.currentPage=1;
-  if (state.results) renderTable(state.results);
-}
-
-function goToPage(p) {
-  if (p<1||p>state.totalPages) return;
-  state.currentPage=p;
-  if (state.results) renderTable(state.results);
-}
+function setPageSize(n) { state.pageSize=n; state.currentPage=1; if(state.results) renderTable(state.results); }
+function setFsPageSize(n) { state.fsPageSize=n; state.fsCurrentPage=1; renderFsTable(); }
+function goToPage(p) { if(p<1||p>state.totalPages) return; state.currentPage=p; if(state.results) renderTable(state.results); }
+function goToFsPage(p) { if(p<1||p>state.fsTotalPages) return; state.fsCurrentPage=p; renderFsTable(); document.getElementById('fs-table-scroll').scrollTop=0; }
 
 function renderTable(data) {
   const isMissing = state.view==='missing';
   document.getElementById('table-title').textContent = isMissing ? 'Missing Devices' : 'Found Devices';
   const searchVal = document.getElementById('search-input').value.toLowerCase();
-  const {headHTML,bodyHTML,totalRows} = buildTableHTML(isMissing,searchVal,data);
+  const {headHTML,bodyHTML,totalRows} = buildTableHTML(isMissing,searchVal,data,state.currentPage,state.pageSize);
   document.getElementById('table-head').innerHTML = headHTML;
   document.getElementById('table-body').innerHTML = bodyHTML;
   const rc = document.getElementById('row-count');
   rc.textContent = totalRows + ' row' + (totalRows!==1?'s':'');
   rc.style.display = '';
   document.getElementById('table-scroll').classList.add('has-results');
+  document.getElementById('table-scroll').classList.toggle('missing-scroll', isMissing);
+  const mib = document.getElementById('missing-info-banner');
+  if(mib) mib.style.display = (isMissing && totalRows > 0) ? '' : 'none';
   renderPagination(totalRows);
   showTable();
 }
 
 function sortBy(col) {
-  state.currentPage = 1;
+  state.currentPage = 1; state.fsCurrentPage = 1;
   if(state.sortCol===col) state.sortDir*=-1; else { state.sortCol=col; state.sortDir=1; }
   if(state.results) renderTable(state.results);
+  if(state.results && document.getElementById('fs-overlay').classList.contains('open')) renderFsTable();
 }
 
 function toggleSearchClear(btnId,val) { document.getElementById(btnId).style.display=val?'flex':'none'; }
@@ -1436,6 +1669,8 @@ function clearSearch(inputId) {
   document.getElementById(inputId).value='';
   document.getElementById(inputId==='search-input'?'search-clear':'fs-search-clear').style.display='none';
 }
+let _filterTimer = null;
+function debounceFilter() { clearTimeout(_filterTimer); _filterTimer = setTimeout(filterTable, 160); }
 function filterTable() { state.currentPage=1; if(state.results) renderTable(state.results); }
 function toggleLookupActive(val) { document.getElementById('lookup-btn').classList.toggle('has-input',val.trim().length>0); }
 function toggleApplyActive(val) { const btn=document.getElementById('apply-btn');if(btn)btn.classList.toggle('has-input',val.trim().length>0); }
@@ -1443,21 +1678,28 @@ function toggleApplyActive(val) { const btn=document.getElementById('apply-btn')
 function selectViewCard(v) {
   state.view=v; state.currentPage=1;
   document.getElementById('search-input').value='';
+  const sc = document.getElementById('search-clear'); if(sc) sc.style.display='none';
   document.getElementById('vc-found').classList.toggle('active-card',v==='found');
   document.getElementById('vc-missing').classList.toggle('active-card',v==='missing');
   document.getElementById('maximize-btn').style.display='';
   document.getElementById('export-found-btn').style.display=v==='found'?'':'none';
   document.getElementById('export-missing-btn').style.display=v==='missing'?'':'none';
+  const cb=document.getElementById('composed-export-btn');
+  if(cb) cb.style.display=(state.results)?'':'none';
   document.getElementById('table-scroll').classList.toggle('missing-scroll',v==='missing');
   const filterBtn=document.getElementById('filter-trigger-btn');
   if(filterBtn) filterBtn.style.display=v==='found'&&state.results&&state.results.found>0?'':'none';
+  if(document.getElementById('fs-overlay').classList.contains('open')) {
+    updateFsExportBtn(v);
+    document.getElementById('fs-title').textContent=v==='missing'?'MISSING DEVICES':'FOUND DEVICES';
+    document.getElementById('fs-table-scroll').classList.toggle('missing-scroll',v==='missing');
+  }
   if(state.results) renderTable(state.results);
 }
 
 function updateFsExportBtn(view) {
   const btn=document.getElementById('fs-export-btn');
-  btn.className='btn btn-sm';
-  btn.classList.add(view==='found'?'btn-success':'btn-danger');
+  btn.className='btn btn-ghost btn-sm';
   btn.textContent=view==='found'?'↓ Export Found':'↓ Export Missing';
 }
 
@@ -1465,68 +1707,150 @@ function openFullscreen() {
   if(!state.results) return;
   const isMissing=state.view==='missing';
   document.getElementById('fs-title').textContent=isMissing?'MISSING DEVICES':'FOUND DEVICES';
-  const cs=document.getElementById('search-input').value;
-  document.getElementById('fs-search-input').value=cs;
-  const {headHTML,bodyHTML,totalRows}=buildTableHTML(isMissing,cs.toLowerCase(),state.results,false);
-  document.getElementById('fs-table-head').innerHTML=headHTML;
-  document.getElementById('fs-table-body').innerHTML=bodyHTML;
-  document.getElementById('fs-row-count').textContent=totalRows+' row'+(totalRows!==1?'s':'');
+  document.getElementById('fs-search-input').value=document.getElementById('search-input').value;
+  state.fsPageSize=state.pageSize; state.fsCurrentPage=state.currentPage;
   document.getElementById('fs-table-scroll').classList.toggle('missing-scroll',isMissing);
   updateFsExportBtn(state.view);
+  document.documentElement.style.overflow='hidden';
   document.getElementById('fs-overlay').classList.add('open');
+  renderFsTable();
 }
 
 function closeFullscreen() {
-  document.getElementById('search-input').value=document.getElementById('fs-search-input').value;
+  const fsSearch=document.getElementById('fs-search-input').value;
+  document.getElementById('search-input').value=fsSearch;
+  toggleSearchClear('search-clear',fsSearch);
+  state.perPage=state.fsPageSize; state.currentPage=state.fsCurrentPage;
+  document.documentElement.style.overflow='';
   document.getElementById('fs-overlay').classList.remove('open');
+  if(document.activeElement) document.activeElement.blur();
   if(state.results) renderTable(state.results);
+}
+
+function renderFsTable() {
+  if(!state.results) return;
+  const isMissing=state.view==='missing';
+  const sv=document.getElementById('fs-search-input').value.toLowerCase();
+  const {headHTML,bodyHTML,totalRows}=buildTableHTML(isMissing,sv,state.results,state.fsCurrentPage,state.fsPageSize);
+  document.getElementById('fs-table-head').innerHTML=headHTML;
+  document.getElementById('fs-table-body').innerHTML=bodyHTML;
+  document.getElementById('fs-row-count').textContent=totalRows+' row'+(totalRows!==1?'s':'');
+  const fmib=document.getElementById('fs-missing-info-banner');
+  if(fmib) fmib.style.display=(isMissing&&totalRows>0)?'':'none';
+  renderPagination(totalRows,'fs-');
 }
 
 function filterFsTable() {
   if(!state.results) return;
-  const isMissing=state.view==='missing';
-  const sv=document.getElementById('fs-search-input').value.toLowerCase();
-  const {headHTML,bodyHTML,totalRows}=buildTableHTML(isMissing,sv,state.results,false);
-  document.getElementById('fs-table-head').innerHTML=headHTML;
-  document.getElementById('fs-table-body').innerHTML=bodyHTML;
-  document.getElementById('fs-row-count').textContent=totalRows+' row'+(totalRows!==1?'s':'');
+  state.fsCurrentPage=1;
+  renderFsTable();
 }
 
+// ─── Export CSV (with filename modal) ─────────────────────────────────────────
+let _exportType = null;
 function exportCSV(type) {
   if(!state.results){showToast('No results to export.','error');return;}
-  const COL_ORDER=['Serial Number','MAC Address','Device Type','Device Model','Part Number','Folder Name','Platform ID'];
-  const selectedCols=COL_ORDER.filter(c=>state.exportCols.has(c));
+  _exportType = type;
+  const titleMap = { found:'Export Found Devices', missing:'Export Missing Devices' };
+  document.getElementById('export-modal-title').textContent = titleMap[type]||'Export';
+  document.getElementById('export-filename-input').value = '';
+  document.getElementById('export-filename-warn').classList.remove('visible');
+  document.getElementById('export-confirm-btn').disabled = true;
+  document.getElementById('export-modal-overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('export-filename-input').focus(),80);
+}
+function onExportFilenameInput(val) {
+  document.getElementById('export-confirm-btn').disabled=!val.trim();
+  document.getElementById('export-filename-warn').classList.remove('visible');
+}
+function closeExportModal() { document.getElementById('export-modal-overlay').classList.remove('open'); _exportType=null; }
+function confirmExport() {
+  const type=_exportType;
+  if(!type||!state.results){closeExportModal();return;}
+  const rawName=document.getElementById('export-filename-input').value.trim();
+  if(!rawName){document.getElementById('export-filename-warn').classList.add('visible');document.getElementById('export-filename-input').focus();return;}
+  const filename=rawName.replace(/[\\/:*?"<>|]/g,'_')+'.csv';
+  const selectedCols=ALL_COLS.filter(c=>state.exportCols.has(c));
   const sv=document.getElementById('search-input').value.toLowerCase().trim();
   const terms=sv.split(',').map(t=>t.trim()).filter(t=>t.length>0);
   const hasSearch=terms.length>0;
   const matchesTerms=str=>terms.some(t=>str.toLowerCase().includes(t));
-
-  // check if any filters are active
-  const hasFilters=Object.values(state.filters).some(s=>s.size>0);
-  const isFiltered=hasSearch||hasFilters;
-  const filename=(isFiltered?'filtered_':'')+type+'_devices.csv';
-
   let csvContent='';
   if(type==='missing'){
     let rows=state.results.missing||[];
     if(hasSearch) rows=rows.filter(d=>matchesTerms(d));
     csvContent='"Missing Device ID","Status"\n';
     rows.forEach(d=>{csvContent+='"'+(d||'').replace(/"/g,'""')+'","NOT FOUND"\n';});
-    showToast(`Exporting ${rows.length} missing device${rows.length!==1?'s':''}.`,'info');
   } else {
-    // apply dynamic filters first, then search filter
     let rows=applyFilters(state.results.devices||[]);
     if(hasSearch) rows=rows.filter(r=>selectedCols.some(c=>matchesTerms((r[c]||'').toString())));
     if(state.sortCol) rows=[...rows].sort((a,b)=>(a[state.sortCol]||'').toString().localeCompare((b[state.sortCol]||'').toString())*state.sortDir);
     csvContent=selectedCols.map(c=>'"'+c+'"').join(',')+'\n';
     rows.forEach(row=>{csvContent+=selectedCols.map(c=>'"'+(row[c]||'').toString().replace(/"/g,'""')+'"').join(',')+'\n';});
-    showToast(`Exporting ${rows.length} device${rows.length!==1?'s':''}${isFiltered?' (filtered)':''}.`,'success');
   }
   const blob=new Blob([csvContent],{type:'text/csv;charset=utf-8;'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
   a.href=url;a.download=filename;a.click();
   URL.revokeObjectURL(url);
+  closeExportModal();
+  showToast('Exported as "'+filename+'".','success');
+}
+
+// ─── Composed Export ──────────────────────────────────────────────────────────
+let composedIsFs=false;
+function getFilteredRows(isMissing, searchVal, data) {
+  const terms=searchVal.split(',').map(t=>t.trim()).filter(t=>t.length>0);
+  const matchesTerms=str=>terms.length===0||terms.some(t=>str.toLowerCase().includes(t));
+  if(isMissing) return (data.missing||[]).filter(d=>matchesTerms(d));
+  const cols=ALL_COLS.filter(c=>state.exportCols.has(c));
+  let rows=applyFilters(data.devices||[]).filter(r=>cols.some(c=>matchesTerms((r[c]||'').toString())));
+  if(state.sortCol) rows=[...rows].sort((a,b)=>(a[state.sortCol]||'').toString().localeCompare((b[state.sortCol]||'').toString())*state.sortDir);
+  return rows;
+}
+function openComposedModal(isFs) {
+  if(!state.results) return;
+  composedIsFs=!!isFs;
+  const inputId=isFs?'fs-search-input':'search-input';
+  const searchVal=document.getElementById(inputId).value.toLowerCase().trim();
+  const isMissing=state.view==='missing';
+  let serials=[];
+  if(isMissing){let rows=state.results.missing||[];if(searchVal)rows=rows.filter(d=>d.toLowerCase().includes(searchVal));serials=rows.filter(Boolean);}
+  else{serials=getFilteredRows(false,searchVal,state.results).map(r=>r['Serial Number']).filter(Boolean);}
+  const preview=serials.slice(0,15).join(',')+( serials.length>15?',...':'');
+  document.getElementById('composed-preview').textContent=serials.length?preview:(isMissing?'No missing devices.':'No serial numbers.');
+  const t=document.getElementById('composed-modal-title');
+  if(t) t.textContent=isMissing?'Composed Export — Missing':'Composed Export — Found';
+  document.getElementById('composed-filename-input').value='';
+  document.getElementById('composed-filename-warn').classList.remove('visible');
+  document.getElementById('composed-confirm-btn').disabled=true;
+  document.getElementById('composed-modal-overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('composed-filename-input').focus(),80);
+}
+function onComposedFilenameInput(val) {
+  document.getElementById('composed-confirm-btn').disabled=!val.trim();
+  document.getElementById('composed-filename-warn').classList.remove('visible');
+}
+function closeComposedModal() { document.getElementById('composed-modal-overlay').classList.remove('open'); }
+function confirmComposedExport() {
+  if(!state.results) return;
+  const inputId=composedIsFs?'fs-search-input':'search-input';
+  const searchVal=document.getElementById(inputId).value.toLowerCase().trim();
+  const isMissing=state.view==='missing';
+  let serials=[];
+  if(isMissing){let rows=state.results.missing||[];if(searchVal)rows=rows.filter(d=>d.toLowerCase().includes(searchVal));serials=rows.filter(Boolean);}
+  else{serials=getFilteredRows(false,searchVal,state.results).map(r=>r['Serial Number']).filter(Boolean);}
+  if(!serials.length){showToast('No serial numbers to export.','error');closeComposedModal();return;}
+  const rawName=document.getElementById('composed-filename-input').value.trim();
+  if(!rawName){document.getElementById('composed-filename-warn').classList.add('visible');document.getElementById('composed-filename-input').focus();return;}
+  const filename=rawName.replace(/[\\/:*?"<>|]/g,'_')+'.txt';
+  const blob=new Blob([serials.join(',')],{type:'text/plain;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=filename;a.click();
+  URL.revokeObjectURL(url);
+  closeComposedModal();
+  showToast('Exported '+serials.length+' serial numbers as "'+filename+'".','success');
 }
 
 function setLoading(on) {

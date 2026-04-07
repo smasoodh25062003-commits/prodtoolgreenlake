@@ -1215,6 +1215,137 @@
     .reveal-delay-1 { transition-delay: 0.1s; }
     .reveal-delay-2 { transition-delay: 0.2s; }
     .reveal-delay-3 { transition-delay: 0.3s; }
+
+    /* ─── ROLE TABS ────────────────────────────────────────────── */
+    .role-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 48px;
+    }
+    .role-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 32px;
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--panel);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.22,1,0.36,1);
+      position: relative;
+      overflow: hidden;
+    }
+    .role-tab::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 50%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .role-tab:hover {
+      border-color: var(--border-bright);
+      color: var(--text);
+      transform: translateY(-2px);
+    }
+    .role-tab:hover::before { opacity: 1; }
+    .role-tab.active {
+      background: linear-gradient(135deg, var(--hpe-green), var(--hpe-green-dim));
+      border-color: var(--hpe-green);
+      color: #000;
+      box-shadow: 0 8px 32px rgba(1,169,130,0.35);
+    }
+    .role-tab.active:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(1,169,130,0.45);
+    }
+    .role-tab.active svg {
+      color: #000;
+    }
+    .role-tab svg {
+      flex-shrink: 0;
+    }
+
+    /* ─── MENTOR BADGE ─────────────────────────────────────────── */
+    .badge-mentor {
+      background: rgba(168,100,255,0.12);
+      border: 1px solid rgba(168,100,255,0.3);
+      color: #a864ff;
+    }
+    .badge-mentor .badge-dot {
+      background: #a864ff;
+      animation: statusPulse 2s infinite;
+    }
+
+    /* ─── MENTOR CARD COLORS ───────────────────────────────────── */
+    .tool-card.card-mentor .card-top-bar {
+      background: linear-gradient(90deg, #a864ff, var(--hpe-purple));
+    }
+    .tool-card.card-mentor .card-icon-wrap {
+      background: linear-gradient(135deg, rgba(168,100,255,0.2), rgba(168,100,255,0.05));
+      border-color: rgba(168,100,255,0.2);
+      color: #a864ff;
+    }
+    .tool-card.card-mentor:hover {
+      border-color: rgba(168,100,255,0.4);
+      box-shadow:
+        0 24px 60px rgba(0,0,0,0.5),
+        0 0 0 1px rgba(168,100,255,0.15);
+    }
+    .tool-card.card-mentor:hover .card-icon-wrap {
+      background: linear-gradient(135deg, rgba(168,100,255,0.3), rgba(168,100,255,0.1));
+      box-shadow: 0 0 24px rgba(168,100,255,0.25);
+    }
+    .tool-card.card-mentor:hover .card-arrow {
+      background: #a864ff;
+      border-color: #a864ff;
+      box-shadow: 0 8px 20px rgba(168,100,255,0.4);
+    }
+    .tool-card.card-mentor:hover .feature-tag {
+      border-color: rgba(168,100,255,0.2);
+    }
+
+    .tool-card.card-mentor.card-cyan .card-top-bar {
+      background: linear-gradient(90deg, var(--hpe-cyan), #a864ff);
+    }
+    .tool-card.card-mentor.card-cyan .card-icon-wrap {
+      background: linear-gradient(135deg, rgba(0,200,255,0.2), rgba(0,200,255,0.05));
+      border-color: rgba(0,200,255,0.2);
+      color: var(--hpe-cyan);
+    }
+    .tool-card.card-mentor.card-cyan:hover {
+      border-color: rgba(0,200,255,0.4);
+      box-shadow:
+        0 24px 60px rgba(0,0,0,0.5),
+        0 0 0 1px rgba(0,200,255,0.15);
+    }
+    .tool-card.card-mentor.card-cyan:hover .card-icon-wrap {
+      background: linear-gradient(135deg, rgba(0,200,255,0.3), rgba(0,200,255,0.1));
+      box-shadow: 0 0 24px rgba(0,200,255,0.2);
+    }
+    .tool-card.card-mentor.card-cyan:hover .card-arrow {
+      background: var(--hpe-cyan);
+      border-color: var(--hpe-cyan);
+      box-shadow: 0 8px 20px rgba(0,200,255,0.3);
+    }
+
+    /* ─── GRID ANIMATION ───────────────────────────────────────── */
+    .tools-grid.fade-out {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+    }
+    .tools-grid.fade-in {
+      opacity: 1;
+      transform: translateY(0);
+      transition: all 0.4s cubic-bezier(0.22,1,0.36,1);
+    }
   </style>
 </head>
 <body>
@@ -1261,8 +1392,8 @@
   </div>
   <h1 class="hero-title">
     <span class="line-1">GreenLake</span>
-    <span class="line-2">Data Fetcher</span>
-    <span class="line-3">Tools</span>
+    <span class="line-2">ARC</span>
+    <span class="line-3">Automation & Resource Console</span>
   </h1>
   <p class="hero-sub">Internal utilities for querying, managing, and analyzing HPE GreenLake platform data. Precision-built for operations teams.</p>
   <div class="hero-cta">
@@ -1404,7 +1535,26 @@
     <p class="section-desc">Select a module below to launch the appropriate utility for your operational task.</p>
   </div>
 
-  <div class="tools-grid">
+  <!-- Role Tabs -->
+  <div class="role-tabs">
+    <button class="role-tab active" data-role="engineers" onclick="switchRole('engineers')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+      </svg>
+      Engineers
+    </button>
+    <button class="role-tab" data-role="mentors" onclick="switchRole('mentors')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+        <path d="M2 17l10 5 10-5"/>
+        <path d="M2 12l10 5 10-5"/>
+      </svg>
+      Mentors
+    </button>
+  </div>
+
+  <!-- Engineers Tools Grid -->
+  <div class="tools-grid" id="engineers-grid">
 
     <!-- Card 1: Device Management -->
     <div class="tool-card" onclick="openTool('device')" id="tile-device">
@@ -1505,6 +1655,86 @@
         </div>
         <div class="card-footer">
           <div class="card-meta">greenlake.hpe.com / customers</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Mentors Tools Grid -->
+  <div class="tools-grid" id="mentors-grid" style="display: none;">
+
+    <!-- Card 1: Device Movement -->
+    <div class="tool-card card-mentor" id="tile-device-movement" onclick="window.location.href='http://localhost:8000/ccs-manager'">
+      <div class="card-glow"></div>
+      <div class="card-top-bar"></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div class="card-icon-wrap">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <rect x="2" y="3" width="20" height="14" rx="2"/>
+              <path d="M8 21h8M12 17v4"/>
+              <path d="M8 10l3 3-3 3"/>
+              <path d="M16 10l-3 3 3 3"/>
+            </svg>
+          </div>
+          <div class="card-badge badge-mentor">
+            <div class="badge-dot"></div>
+            Mentor Tool
+          </div>
+        </div>
+        <div class="card-module-label">Mentor Module 01</div>
+        <div class="card-title">Device Movement</div>
+        <div class="card-desc">Track and manage device transfers between workspaces. Monitor movement history, pending transfers, and device relocation status.</div>
+        <div class="card-features">
+          <span class="feature-tag">Transfer Tracking</span>
+          <span class="feature-tag">Movement History</span>
+          <span class="feature-tag">Workspace Migration</span>
+          <span class="feature-tag">Status Monitor</span>
+        </div>
+        <div class="card-footer">
+          <div class="card-meta">greenlake.hpe.com / device-movement</div>
+          <div class="card-arrow">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2: Subscription Movement -->
+    <div class="tool-card card-mentor card-cyan" id="tile-sub-movement">
+      <div class="card-glow"></div>
+      <div class="card-top-bar"></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div class="card-icon-wrap">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M20 12V22H4V12"/>
+              <path d="M22 7H2v5h20V7z"/>
+              <path d="M12 22V7"/>
+              <path d="M7 14l3 3-3 3"/>
+              <path d="M17 14l-3 3 3 3"/>
+            </svg>
+          </div>
+          <div class="card-badge badge-mentor">
+            <div class="badge-dot"></div>
+            Mentor Tool
+          </div>
+        </div>
+        <div class="card-module-label">Mentor Module 02</div>
+        <div class="card-title">Subscription Movement</div>
+        <div class="card-desc">Manage subscription transfers and license reassignments across accounts. Track entitlement migrations and renewal transitions.</div>
+        <div class="card-features">
+          <span class="feature-tag">License Transfer</span>
+          <span class="feature-tag">Entitlement Migration</span>
+          <span class="feature-tag">Account Reassignment</span>
+          <span class="feature-tag">Transfer History</span>
+        </div>
+        <div class="card-footer">
+          <div class="card-meta">greenlake.hpe.com / subscription-movement</div>
+          <div class="card-arrow">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </div>
         </div>
       </div>
     </div>
@@ -1716,6 +1946,57 @@
     t.classList.add('show');
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => t.classList.remove('show'), 3200);
+  }
+
+  /* ── Role Switching ────────────────────────────────────────── */
+  function switchRole(role) {
+    const tabs = document.querySelectorAll('.role-tab');
+    const engineersGrid = document.getElementById('engineers-grid');
+    const mentorsGrid = document.getElementById('mentors-grid');
+    
+    tabs.forEach(tab => {
+      tab.classList.toggle('active', tab.dataset.role === role);
+    });
+    
+    if (role === 'engineers') {
+      mentorsGrid.classList.add('fade-out');
+      setTimeout(() => {
+        mentorsGrid.style.display = 'none';
+        engineersGrid.style.display = 'grid';
+        engineersGrid.classList.add('fade-in');
+        reinitCards(engineersGrid);
+      }, 300);
+    } else {
+      engineersGrid.classList.add('fade-out');
+      setTimeout(() => {
+        engineersGrid.style.display = 'none';
+        mentorsGrid.style.display = 'grid';
+        mentorsGrid.classList.add('fade-in');
+        reinitCards(mentorsGrid);
+      }, 300);
+    }
+  }
+
+  function reinitCards(grid) {
+    const cards = grid.querySelectorAll('.tool-card');
+    cards.forEach((card, i) => {
+      card.classList.remove('visible');
+      setTimeout(() => card.classList.add('visible'), i * 100);
+      
+      if (!card.classList.contains('disabled')) {
+        card.onmousemove = e => {
+          const rect = card.getBoundingClientRect();
+          const cx = rect.left + rect.width  / 2;
+          const cy = rect.top  + rect.height / 2;
+          const dx = (e.clientX - cx) / (rect.width  / 2);
+          const dy = (e.clientY - cy) / (rect.height / 2);
+          card.style.transform = `translateY(-8px) scale(1.01) perspective(800px) rotateY(${dx * 4}deg) rotateX(${-dy * 4}deg)`;
+        };
+        card.onmouseleave = () => {
+          card.style.transform = '';
+        };
+      }
+    });
   }
 </script>
 
